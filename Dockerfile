@@ -1,20 +1,20 @@
-# Use a newer Node.js image as a base (Node 16 or higher supports the ??= operator)
-FROM node:18
-
-# Set the working directory
+# Use the latest LTS version of Node.js
+FROM node:18-alpine
+ 
+# Set the working directory inside the container
 WORKDIR /app
-
-# Copy package.json and package-lock.json (or yarn.lock)
+ 
+# Copy package.json and package-lock.json
 COPY package*.json ./
-
+ 
 # Install dependencies
 RUN npm install
-
-# Copy the rest of the application code
+ 
+# Copy the rest of your application files
 COPY . .
-
-# Expose the port the app runs on
-EXPOSE 19006
-
-# Command to run the application
-CMD ["npm", "run", "web"]
+ 
+# Expose the port your app runs on
+EXPOSE 3000
+ 
+# Define the command to run your app
+CMD ["npm", "start"]

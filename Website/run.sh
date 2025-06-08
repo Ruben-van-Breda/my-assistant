@@ -5,5 +5,5 @@
 docker stop static-web || true
 docker rm static-web || true    
 docker build -t static-web .
-docker run -d -p 8080:8000 --name static-web static-web
+docker run -d -p 8000:8000 --name static-web static-web
 # python3 -m http.server 8000 --directory src

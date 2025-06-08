@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat with n8n</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: 20px auto;
+            text-align: center;
+        }
+        .chat-container {
+            border: 1px solid #ccc;
+            padding: 10px;
+            height: 300px;
+            overflow-y: auto;
+            text-align: left;
+            margin-bottom: 10px;
+        }
+        .input-container {
+            display: flex;
+        }
+        input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+        button {
+            padding: 10px;
+            background-color: blue;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Chat with n8n</h1>
+    <div class="chat-container" id="chat"></div>
+    <div class="input-container">
+        <input type="text" id="message" placeholder="Type a message...">
+        <button onclick="sendMessage()">Movie🍿</button>
+    </div>
+
+    <script>
+        async function sendMessage() {
+            const message = document.getElementById("message").value;
+            if (!message) return;
+
+            const chatContainer = document.getElementById("chat");
+            chatContainer.innerHTML += `<p><strong>You:</strong> ${message}</p>`;
+            document.getElementById("message").value = ""; // Clear input
+
+            try {
+                const url = `https://n8n.my-assistant.co.za/webhook/movie?q=${encodeURIComponent(message)}`;
+                console.log("Fetching:", url); // Debugging
+
+                const response = await fetch(url, {
+                    method: "GET",
+                    headers: { "Accept": "application/json" }
+                });
+
+                const data = await response.json();
+                console.log("n8n Response:", data); // Log full response
+                // Extracting response based on API response structure
+                let botReply = "No response received.";
+
+                if (typeof data === "string") {
+                    botReply = data;
+                } else if (data.response) {
+                    botReply = data.response;
+                } else if (data.output) {
+                    botReply = data.output;
+                } else if (data.text) {
+                    botReply = data.text;
+                } else if (Object.keys(data).length > 0) {
+                    botReply = JSON.stringify(data);
+                }
+
+                chatContainer.innerHTML += `<p><strong>n8n:</strong> ${botReply}</p>`;
+                chatContainer.scrollTop = chatContainer.scrollHeight; // Auto-scroll
+            } catch (error) {
+                console.error("Fetch error:", error);
+                chatContainer.innerHTML += `<p><strong>Error:</strong> Unable to fetch response.</p>`;
+            }
+        }
+
+        // Add event listener for the Enter key
+        document.addEventListener('DOMContentLoaded', function() {
+            const messageInput = document.getElementById("message");
+            
+            messageInput.addEventListener("keypress", function(event) {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    sendMessage();
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,6 @@
+
+Services/chatgpt_service/venv/*
+Services/service1/venv/*
+Services/siperb_kb_service/venv/*
+Services/chatgpt_service/secrets.txt
+Services/siperb_kb_service/secrets.txt

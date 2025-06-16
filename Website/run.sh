@@ -1,7 +1,7 @@
 #!/bin/bash
 
 service_name="static-web"
-port=8080
+port=8000
 echo "Building $service_name service"
 echo "Using port $port"
 echo "----------"
@@ -14,6 +14,6 @@ docker build -t $service_name .
 
 
 echo "Running Python HTTP server on port 8000"
-docker run -p 8080:8000 $service_name
+docker run -p 8000:8000 $service_name
 # python3 -m http.server 8000 --directory src
 # echo "Service $service_name is running on port $port"

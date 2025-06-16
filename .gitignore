@@ -4,3 +4,6 @@ Services/service1/venv/*
 Services/siperb_kb_service/venv/*
 Services/chatgpt_service/secrets.txt
 Services/siperb_kb_service/secrets.txt
+.DS_Store
+Website/.DS_Store
+.DS_Store

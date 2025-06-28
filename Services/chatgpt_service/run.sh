@@ -18,6 +18,6 @@ docker rmi $service_name
 docker build -t $service_name .
 echo "Service $service_name is running on port $port"
 
-docker run -p $port:$port $service_name
+docker run -d --name $service_name -p $port:$port $service_name
 # echo "Running Python HTTP server on port $port"
 # python3 -m http.server 8000 --directory src

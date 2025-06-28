@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "chat-mcp-service": {
+      "command": "python",
+      "args": ["server.py"],
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}"
+      }
+    }
+  }
+}

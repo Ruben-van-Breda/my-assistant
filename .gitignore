@@ -7,3 +7,6 @@ Services/siperb_kb_service/secrets.txt
 .DS_Store
 Website/.DS_Store
 .DS_Store
+*.txt
+
+Services/service1/venv/*

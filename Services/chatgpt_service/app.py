@@ -92,6 +92,16 @@ def query_data():
 
     return jsonify({"query": query, "response": chat_response})
 
+@app.route('/chat', methods=['POST'])
+def chat():
+    data = request.get_json()
+    if not data or 'message' not in data:
+        return jsonify({"error": "No message provided"}), 400
+
+    user_message = data['message']
+    chat_response = Query(user_message)
+    return jsonify({"reply": chat_response})
+
 
 if __name__ == '__main__':
     app.run(debug=True)

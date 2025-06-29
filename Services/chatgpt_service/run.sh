@@ -1,7 +1,7 @@
 #!/bin/bash
 
 service_name="chatgpt_service"
-port=5001
+port=5002
 echo "Building $service_name service"
 echo "Using port $port"
 echo "----------"

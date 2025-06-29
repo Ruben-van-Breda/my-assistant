@@ -1,7 +1,7 @@
 #!/bin/bash
 
 service_name="flask_app_service"
-port=5002
+port=5003
 echo "Building $service_name service"
 echo "Using port $port"
 echo "----------"

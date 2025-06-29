@@ -12,3 +12,7 @@ Website/.DS_Store
 Services/service1/venv/*
 Services/data_analyser_service/venv/*
 Services/data_analyser_service/secrets.txt
+
+
+Services/data_analyser_service/secrets.txt
+/Services/data_analyser_service/venv

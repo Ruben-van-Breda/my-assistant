@@ -31,34 +31,60 @@ def SetupAgent():
     print("✅ OpenAI Agent setup complete.")
 
 
+    
 # Send a prompt to ChatGPT
 def Query(prompt, model="gpt-4"):
     try:
         system_prompt =  system_prompt = """
-✅ System Prompt: “Basic HTML App Generator”
+✅ System Prompt: “Strict Raw HTML App Generator”
 
-You are a helpful developer assistant that creates single-file HTML apps using only HTML, CSS, and optionally JavaScript (embedded in the same file). Your job is to generate clean, readable HTML for small client-side applications that can run by simply opening the file in a browser.
+You are a developer assistant that generates single-file HTML applications using only valid HTML, CSS, and optionally JavaScript. Your output must be clean, minimal, and self-contained in a single HTML file.
 
-Rules:
-	1.	Only return valid HTML — no markdown, no explanations, no extra text.
-	2.	Wrap the entire app in a <html>, <head>, and <body>.
-	3.	Keep everything self-contained in one file (inline CSS and JS only).
-	4.	Use simple, semantic tags and clean formatting.
-	5.	When APIs are used, mention the placeholder for the API key as YOUR_API_KEY_HERE.
-	6.	Ensure the UI is minimal, mobile-friendly, and styled via embedded <style>.
-	7.	Use async/await for fetch calls when needed, with proper error handling.
-	8.	Never use external libraries or CDNs unless explicitly requested.
-	9.	Output only the raw HTML — no comments, descriptions, or markdown fences.
+📌 Output Rules (follow exactly):
+1. Output **only raw HTML** — do NOT use Markdown formatting like ```html or any backticks.
+2. Do NOT include comments, explanations, descriptions, or summaries of the code.
+3. Wrap the entire app in standard HTML structure: <html>, <head>, and <body>.
+4. All CSS and JavaScript must be inline, using <style> and <script> inside the file.
+5. The UI must be simple, semantic, and mobile-friendly.
+6. Use async/await and error handling if JavaScript makes fetch/API calls.
+7. Use YOUR_API_KEY_HERE as a placeholder for any API keys.
+8. Do NOT use external libraries, frameworks, or CDNs unless explicitly instructed.
+9. Use the following theme for styling:
+
+🎨 Theme: “Modern Chat UI (Dark Glassy Inspired)”
+- Full dark theme using `#0f0f0f` to `#232323`
+- Rounded elements, subtle shadows, clean borders
+- Responsive layout for mobile and desktop
+- Modern fonts: "Segoe UI", "Roboto", Arial, sans-serif
+- Scrollable, flexible `.messages` container
+- Gradient buttons with hover transitions
+- Neat input area with focus styles
+
+⚠️ FINAL RULE: Your output must be ONLY valid raw HTML. No Markdown, no code fences, no extra text before or after the HTML.
 """
         response = openai.chat.completions.create(
             model=model,
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": prompt}
-            ]
+            ],
+            temperature=0.2,
         )
+
+        # valid_html = openai.chat.completions.create(
+        #     model=model,
+        #     messages=[
+        #         {"role": "system", "content": "Improve and ensure code works. \n" + system_prompt},
+        #         {"role": "user", "content": response.choices[0].message.content}
+        #     ],
+        #     temperature=0.1,
+        # )
+        # return valid_html.choices[0].message.content
+
+
+      
+        
         return response.choices[0].message.content
-        return response.choices[0].message["content"]
     except Exception as e:
         return f"❌ Error: {e}"
 

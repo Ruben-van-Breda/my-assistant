@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: "Segoe UI", "Roboto", Arial, sans-serif;
+            background-color: #0f0f0f;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            padding: 20px;
+        }
+        .todo-list {
+            width: 100%;
+            max-width: 500px;
+            background-color: #232323;
+            border-radius: 10px;
+            overflow: auto;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        .todo-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #0f0f0f;
+        }
+        .todo-input {
+            width: 100%;
+            max-width: 500px;
+            padding: 10px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 10px;
+            background-color: #232323;
+            color: #fff;
+            outline: none;
+        }
+        .todo-input:focus {
+            box-shadow: 0 0 10px #0f0f0f;
+        }
+        .timer {
+            margin-top: 20px;
+            font-size: 2em;
+        }
+        .add-btn {
+            margin-top: 10px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(45deg, #0f0f0f, #232323);
+            color: #fff;
+            cursor: pointer;
+            transition: background 0.5s;
+        }
+        .add-btn:hover {
+            background: linear-gradient(45deg, #232323, #0f0f0f);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="timer">00:00:00</div>
+        <input type="text" class="todo-input" placeholder="Enter a task...">
+        <button class="add-btn">Add Task</button>
+        <div class="todo-list"></div>
+    </div>
+    <script>
+        const timer = document.querySelector('.timer');
+        const todoInput = document.querySelector('.todo-input');
+        const addBtn = document.querySelector('.add-btn');
+        const todoList = document.querySelector('.todo-list');
+
+        let seconds = 0, minutes = 0, hours = 0;
+        setInterval(() => {
+            seconds++;
+            if (seconds >= 60) {
+                minutes++;
+                seconds = 0;
+            }
+            if (minutes >= 60) {
+                hours++;
+                minutes = 0;
+            }
+            timer.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }, 1000);
+
+        addBtn.addEventListener('click', () => {
+            if (todoInput.value.trim() !== '') {
+                const todoItem = document.createElement('div');
+                todoItem.classList.add('todo-item');
+                todoItem.textContent = todoInput.value;
+                todoList.appendChild(todoItem);
+                todoInput.value = '';
+            }
+        });
+    </script>
+</body>
+</html>

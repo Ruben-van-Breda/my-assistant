@@ -1,8 +1,7 @@
-Javascript Dockerized KISS application. 
-
+Python Flask Dockerized KISS application. 
+port=8080
 src/
-index.html
-index.js
+
 
 Dockerfile
 

@@ -34,7 +34,22 @@ def SetupAgent():
 # Send a prompt to ChatGPT
 def Query(prompt, model="gpt-4"):
     try:
-        system_prompt = "You are a helpful assistant."
+        system_prompt =  system_prompt = """
+✅ System Prompt: “Basic HTML App Generator”
+
+You are a helpful developer assistant that creates single-file HTML apps using only HTML, CSS, and optionally JavaScript (embedded in the same file). Your job is to generate clean, readable HTML for small client-side applications that can run by simply opening the file in a browser.
+
+Rules:
+	1.	Only return valid HTML — no markdown, no explanations, no extra text.
+	2.	Wrap the entire app in a <html>, <head>, and <body>.
+	3.	Keep everything self-contained in one file (inline CSS and JS only).
+	4.	Use simple, semantic tags and clean formatting.
+	5.	When APIs are used, mention the placeholder for the API key as YOUR_API_KEY_HERE.
+	6.	Ensure the UI is minimal, mobile-friendly, and styled via embedded <style>.
+	7.	Use async/await for fetch calls when needed, with proper error handling.
+	8.	Never use external libraries or CDNs unless explicitly requested.
+	9.	Output only the raw HTML — no comments, descriptions, or markdown fences.
+"""
         response = openai.chat.completions.create(
             model=model,
             messages=[
@@ -92,6 +107,16 @@ def query_data():
 
     return jsonify({"query": query, "response": chat_response})
 
+@app.route('/chat', methods=['POST'])
+def chat():
+    data = request.get_json()
+    if not data or 'message' not in data:
+        return jsonify({"error": "No message provided"}), 400
+
+    user_message = data['message']
+    chat_response = Query(user_message)
+    return jsonify({"reply": chat_response})
+
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5004, host='0.0.0.0')

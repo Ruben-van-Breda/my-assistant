@@ -244,10 +244,62 @@
     </div>
 
     <script>
+
+      // On Document Load
+      window.addEventListener("DOMContentLoaded", () => {
+      });
+      document.addEventListener("DOMContentLoaded", () => {
+                chatHistory = [];
+                saveChatHistory();
+                renderChatHistory();
+                addMessage("Welcome to the chat! How can I assist you today?", "bot");
+
+      });
       const input = document.getElementById("messageInput");
       const sendBtn = document.getElementById("sendBtn");
       const messagesEl = document.getElementById("messages");
       const modelSel = document.getElementById("modelSelect");
+
+      // --- Chat history logic ---
+      let chatHistory = [];
+
+      // Load chat history from localStorage
+      function loadChatHistory() {
+        const saved = localStorage.getItem("chatHistory");
+        if (saved) {
+          chatHistory = JSON.parse(saved);
+          renderChatHistory();
+        }
+      }
+
+      // Save chat history to localStorage
+      function saveChatHistory() {
+        localStorage.setItem("chatHistory", JSON.stringify(chatHistory));
+      }
+
+      // Render all messages from chatHistory
+      function renderChatHistory() {
+        messagesEl.innerHTML = "";
+        chatHistory.forEach(msg => {
+          addMessage(msg.text, msg.sender, false);
+        });
+      }
+
+      // Modified addMessage to optionally skip saving
+      function addMessage(text, sender = "user", save = true) {
+        const msg = document.createElement("div");
+        msg.classList.add("message", sender);
+        msg.textContent = text;
+        messagesEl.appendChild(msg);
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+        if (save) {
+          chatHistory.push({ text, sender });
+          saveChatHistory();
+        }
+      }
+
+      // On page load, load chat history
+      loadChatHistory();
 
       const modelUrls = {
         chatgpt: "http://localhost:5002",
@@ -259,14 +311,6 @@
       });
 
       // Get Loading
-
-      function addMessage(text, sender = "user") {
-        const msg = document.createElement("div");
-        msg.classList.add("message", sender);
-        msg.textContent = text;
-        messagesEl.appendChild(msg);
-        messagesEl.scrollTop = messagesEl.scrollHeight;
-      }
 
       sendBtn.addEventListener("click", async () => {
         const text = input.value.trim();
@@ -280,19 +324,19 @@
         // Show loading indicator
         const loadingMsg = addLoadingMessage();
 
+        // extract the last 10 messages
+        const lastMessages = chatHistory.slice(-10).map(msg => msg.text).join("\n");
+        console.log("Last messages:", lastMessages);
         try {
           const response = await fetch(url + "/chat", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message: text }),
+            body: JSON.stringify({ message:   lastMessages}),
           });
           const data = await response.json();
+          chatHistory.push({ text: data.reply || "(No reply)", sender: "bot" });
+          saveChatHistory();
           removeLoadingMessage(loadingMsg);
-
-        
-
-
-          // addMessage(data.reply || "(No reply)", "bot");
 
           if (model === "html_server") {
             const html =
@@ -303,9 +347,6 @@
             newWindow.document.write(html);
             newWindow.document.close();
 
-         
-
-            // Save
             base_url = "http://localhost:8080";
             const save_response = await fetch(base_url + "/save", {
               method: "POST",
@@ -317,7 +358,6 @@
 
             addViewAppButton();
 
-       
           }
           else{
             addMessage(data.reply || "(No reply)", "bot");
@@ -366,7 +406,7 @@
 
         // Add text
         const loadingText = document.createElement("span");
-        loadingText.textContent = "Loading...";
+        loadingText.textContent = "Building...";
 
         loadingMsg.appendChild(lottieContainer);
         loadingMsg.appendChild(loadingText);

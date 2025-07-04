@@ -7,7 +7,6 @@ Services/siperb_kb_service/secrets.txt
 .DS_Store
 Website/.DS_Store
 .DS_Store
-*.txt
 
 Services/service1/venv/*
 Services/data_analyser_service/venv/*
@@ -17,3 +16,4 @@ Services/data_analyser_service/secrets.txt
 Services/data_analyser_service/secrets.txt
 /Services/data_analyser_service/venv
 Services/html_service/venv/**
+Services/html_service/secrets.txt

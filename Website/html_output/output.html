@@ -1,1 +1,124 @@
-I'm sorry, but as per the rules, we cannot use external libraries such as Three.js. The HTML file must be self-contained and not rely on external resources.
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Side Scroller Jumping Game</title>
+    <style>
+        body {
+            background-color: #f0f0f0;
+            font-family: "Segoe UI", "Roboto", Arial, sans-serif;
+            color: #0f0f0f;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        #game {
+            position: relative;
+            height: 200px;
+            width: 100%;
+            overflow: hidden;
+        }
+        .player {
+            background: url('penguin.png') no-repeat center;
+            background-size: cover;
+            position: absolute;
+            bottom: 0;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        .animate {
+            animation: jump 0.5s;
+        }
+        @keyframes jump {
+            0% { bottom: 0; }
+            50% { bottom: 60px; }
+            100% { bottom: 0; }
+        }
+        .obstacle {
+            background-color: #232323;
+            position: absolute;
+            bottom: 0;
+            width: 20px;
+            height: 60px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        #restart {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: linear-gradient(45deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        #restart:hover {
+            background: linear-gradient(45deg, #fad0c4 0%, #ff9a9e 99%, #ff9a9e 100%);
+        }
+    </style>
+</head>
+<body>
+    <div id="game">
+        <div class="player" id="player"></div>
+        <div class="obstacle" id="obstacle"></div>
+    </div>
+    <button id="restart">Restart</button>
+
+    <script>
+        const player = document.getElementById('player');
+        const obstacle = document.getElementById('obstacle');
+        const restart = document.getElementById('restart');
+
+        function jump() {
+            if (player.classList != 'animate') {
+                player.classList.add('animate');
+            }
+            setTimeout(function () {
+                player.classList.remove('animate');
+            }, 500);
+        }
+
+        document.body.addEventListener('keyup', function (event) {
+            if (event.code === 'Space') {
+                jump();
+            }
+        });
+
+        setInterval(function () {
+            const playerTop = parseInt(window.getComputedStyle(player).getPropertyValue('top'));
+            const obstacleLeft = parseInt(window.getComputedStyle(obstacle).getPropertyValue('left'));
+
+            if (obstacleLeft < 20 && obstacleLeft > 0 && playerTop >= 130) {
+                alert('Game Over!');
+                document.location.reload();
+            }
+        }, 10);
+
+        function moveObstacle() {
+            let obstaclePos = 500;
+            const obstacleTimer = setInterval(function () {
+                if (obstaclePos === 0) {
+                    clearInterval(obstacleTimer);
+                    document.getElementById('game').removeChild(obstacle);
+                } else {
+                    obstaclePos -= 10;
+                    obstacle.style.left = obstaclePos + 'px';
+                }
+            }, 50);
+        }
+
+        moveObstacle();
+
+        restart.addEventListener('click', function () {
+            document.location.reload();
+        });
+    </script>
+</body>
+</html>

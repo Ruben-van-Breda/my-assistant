@@ -241,19 +241,18 @@ def load_user_files():
             print("No user_id in session")
             return []
 
-        # Get user's project directory
-        user_project_dir = get_user_project_dir()
-        generated_dir = os.path.join(user_project_dir, 'static', 'generated')
+        # Get user's directory in static/projects
+        user_dir = os.path.join(PROJECTS_DIR, user_id)
         
-        # Ensure output directory exists
-        if not os.path.exists(generated_dir):
-            print("Generated directory does not exist")
-            os.makedirs(generated_dir, exist_ok=True)
+        # Ensure directory exists
+        if not os.path.exists(user_dir):
+            print("User directory does not exist")
+            os.makedirs(user_dir, exist_ok=True)
             return []
 
         # Load and filter files
         try:
-            files = os.listdir(generated_dir)
+            files = [f for f in os.listdir(user_dir) if f.endswith('.html')]
             print("User files loaded:", files)
             return files
         except Exception as e:
@@ -277,19 +276,19 @@ def save_html():
             
         # Get user's project directory
         user_id = session.get('user_id', 'default')
-        user_project_dir = get_user_project_dir()
-        static_dir = os.path.join(user_project_dir, 'static')
-        generated_dir = os.path.join(static_dir, 'generated')
         
-        # Ensure generated directory exists
-        os.makedirs(generated_dir, exist_ok=True)
+        # Save directly to static/projects/{userid}/
+        user_dir = os.path.join(PROJECTS_DIR, user_id)
+        
+        # Ensure user directory exists
+        os.makedirs(user_dir, exist_ok=True)
             
         # Clean filename and ensure it ends with .html
         safe_filename = secure_filename(filename)
         if not safe_filename.endswith('.html'):
             safe_filename += '.html'
             
-        filepath = os.path.join(generated_dir, safe_filename)
+        filepath = os.path.join(user_dir, safe_filename)
         
         if should_save:
             # Save to permanent location if save is requested
@@ -299,9 +298,43 @@ def save_html():
         # Return the URL where the file can be accessed
         return jsonify({
             'message': 'HTML saved successfully' if should_save else 'HTML generated successfully',
-            'url': f'/static/projects/{user_id}/static/generated/{safe_filename}',
+            'url': f'/static/projects/{user_id}/{safe_filename}',
             'saved': should_save,
             'filename': safe_filename
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/delete_file', methods=['POST'])
+def delete_file():
+    try:
+        data = request.get_json()
+        filename = data.get('filename')
+        
+        if not filename:
+            return jsonify({'error': 'No filename provided'}), 400
+            
+        # Get user's directory
+        user_id = session.get('user_id', 'default')
+        user_dir = os.path.join(PROJECTS_DIR, user_id)
+        
+        # Construct full file path
+        filepath = os.path.join(user_dir, secure_filename(filename))
+        
+        # Ensure the path is within the user's directory
+        if not os.path.commonpath([filepath, user_dir]) == user_dir:
+            return jsonify({'error': 'Invalid file path'}), 403
+            
+        # Check if file exists
+        if not os.path.exists(filepath):
+            return jsonify({'error': 'File not found'}), 404
+            
+        # Delete the file
+        os.remove(filepath)
+        
+        return jsonify({
+            'message': 'File deleted successfully',
+            'filename': filename
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500

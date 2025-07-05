@@ -18,19 +18,28 @@
                 extend: {
                     colors: {
                         dark: {
-                            100: '#181818',
-                            200: '#1e1e1e',
-                            300: '#232323',
-                            400: '#282828',
-                            500: '#333333',
+                            100: '#121212',
+                            200: '#1E1E1E',
+                            300: '#2D2D2D',
+                            400: '#363636',
+                            500: '#404040',
+                        },
+                        accent: {
+                            primary: '#3B82F6',
+                            secondary: '#1D4ED8',
+                            success: '#059669',
+                            danger: '#DC2626'
                         }
+                    },
+                    boxShadow: {
+                        'soft': '0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04)',
                     }
                 }
             }
         }
     </script>
 </head>
-<body class="bg-dark-100 text-white">
+<body class="bg-dark-100 text-white h-screen flex flex-col overflow-hidden">
     <!-- Add Modal for Preview and Save -->
     <div id="previewModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
         <div class="bg-dark-200 rounded-lg w-full max-w-4xl mx-4 max-h-[90vh] flex flex-col">
@@ -63,528 +72,747 @@
         </div>
     </div>
 
-    <div class="flex h-screen w-screen overflow-hidden">
-        <!-- Project Files Sidebar -->
-        <div id="projectSidebar" class="fixed inset-y-0 left-0 w-72 bg-dark-200 transform -translate-x-full transition-transform duration-300 ease-in-out z-30">
-            <div class="h-full flex flex-col">
-                <div class="p-4 border-b border-dark-300 flex items-center justify-between">
-                    <h3 class="text-lg font-semibold">Project Files</h3>
-                    <button id="closeSidebar" class="p-2 hover:bg-dark-300 rounded-lg transition-colors">
+    <!-- File Content Modal -->
+    <div id="fileContentModal" class="fixed inset-0 bg-black/90 z-50 hidden opacity-0 transition-opacity duration-300">
+        <div class="fixed inset-0 flex items-center justify-center">
+            <div class="bg-dark-200 w-full h-full flex flex-col opacity-0 translate-y-4 transition-all duration-300" id="modalContent">
+                <!-- Modal Header -->
+                <div class="flex items-center justify-between p-6 border-b border-dark-300">
+                    <h3 id="fileContentTitle" class="text-xl font-semibold text-white"></h3>
+                    <button id="closeFileContentModal" class="p-2 hover:bg-dark-300 rounded-lg transition-colors text-gray-400 hover:text-white">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
                 </div>
-                <!-- <div class="flex-1 overflow-y-auto p-4 space-y-2">
-                    {% set current_dir = '' %}
-                    {% for file in project_files %}
-                        {% if file.directory != current_dir %}
-                            {% if not loop.first %}</div>{% endif %}
-                            <div class="mb-4">
-                                <div class="text-gray-400 text-xs font-medium mb-2 px-2">{{ file.directory or 'Root' }}</div>
-                                <div class="space-y-1">
-                            {% set current_dir = file.directory %}
-                        {% endif %}
-                        <div class="file-item p-2 hover:bg-dark-300 rounded-lg cursor-pointer transition-colors text-sm flex items-center gap-2" 
-                             data-path="{{ file.path }}">
-                            {% if file.type == 'html' %}
-                            <svg class="w-4 h-4 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-                            </svg>
-                            {% elif file.type == 'code' %}
-                            <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                            </svg>
-                            {% elif file.type == 'style' %}
-                            <svg class="w-4 h-4 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-                            </svg>
-                            {% elif file.type == 'data' %}
-                            <svg class="w-4 h-4 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
-                            </svg>
-                            {% else %}
-                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            {% endif %}
-                            <span class="truncate">{{ file.name }}</span>
-                        </div>
-                        {% if loop.last %}</div></div>{% endif %}
-                    {% endfor %}
-                    {% if not project_files %}
-                    <div class="text-gray-400 text-center py-4">
-                        No project files found
-                    </div>
-                    {% endif %}
-                </div> -->
-            </div>
-        </div>
-
-        <!-- Hamburger Menu Button -->
-        <button id="hamburgerBtn" class="fixed top-4 left-4 p-2 hover:bg-dark-300 rounded-lg transition-colors z-20">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-        </button>
-
-        <!-- Overlay -->
-        <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden"></div>
-
-        <!-- Files Sidebar -->
-        <div class="w-64 bg-dark-200 border-r border-dark-300 p-5 overflow-y-auto hidden md:block">
-            <h3 class="text-lg font-semibold mb-4 pb-3 border-b border-dark-300">Your Files</h3>
-            {% if error %}
-            <div class="p-3 mb-4 bg-red-900/30 border border-red-900/50 text-red-400 rounded-lg text-sm">
-                {{ error }}
-            </div>
-            {% endif %}
-            <div class="space-y-2">
-                {% for file in user_files %}
-                <a href="/static/projects/{{ session['user_id'] }}/static/generated/{{ file }}" target="_blank" 
-                   class="block p-3 bg-dark-300 hover:bg-dark-400 rounded-lg text-gray-200 text-sm transition-colors">
-                    {{ file }}
-                </a>
-                {% endfor %}
-                {% if not user_files %}
-                <div class="p-3 bg-dark-300 rounded-lg text-gray-500 text-sm">No files yet</div>
-                {% endif %}
-            </div>
-        </div>
-
-        <!-- Main Content -->
-        <div class="flex-1 flex flex-col bg-dark-100">
-            <!-- Header -->
-            <div class="bg-dark-200 border-b border-dark-300 p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <nav class="flex gap-4">
-                    <a href="{{ url_for('index') }}" class="px-4 py-2 text-gray-300 hover:text-white hover:bg-dark-300 rounded-lg transition-colors">Home</a>
-                    <a href="{{ url_for('create') }}" class="px-4 py-2 text-gray-300 hover:text-white hover:bg-dark-300 rounded-lg transition-colors">Create</a>
-                </nav>
-                
-                <!-- Model Dropdown -->
-                <div class="relative w-full md:w-auto">
-                    <button id="modelDropdown" class="w-full md:w-auto px-4 py-2 bg-dark-300 border border-dark-500 rounded-lg text-white flex items-center justify-between gap-2 hover:bg-dark-400 transition-colors">
-                        <span id="selectedModel">Select Model</span>
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </button>
-                    <div id="dropdownMenu" class="hidden absolute right-0 mt-2 w-full md:w-64 bg-dark-200 border border-dark-500 rounded-lg shadow-lg z-50">
-                        <!-- Services will be dynamically loaded here -->
-                    </div>
+                <!-- Modal Content -->
+                <div class="flex-1 overflow-hidden max-h-[90vh]">
+                    <div id="fileContentPreview" class="h-full"></div>
                 </div>
-            </div>
-
-            <!-- Messages -->
-            <div id="messages" class="flex-1 p-4 md:p-6 space-y-4 overflow-y-auto bg-dark-100">
-                <!-- Messages will be added here -->
-            </div>
-
-            <!-- Input Area -->
-            <div class="p-4 bg-dark-200 border-t border-dark-300 space-y-2">
-                <div class="flex gap-2">
-                    <input type="text" id="messageInput" 
-                           class="flex-1 px-4 py-3 bg-dark-300 border border-dark-500 rounded-full text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                           placeholder="Type your message…" disabled>
-                    <button id="sendBtn" 
-                            class="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:opacity-50 rounded-full font-medium transition-colors"
-                            disabled>Send</button>
-                </div>
-                <button id="clearBtn" 
-                        class="w-full px-6 py-2 border border-dark-500 text-gray-400 hover:text-white hover:bg-dark-300 rounded-lg transition-colors disabled:opacity-50"
-                        disabled>Clear Chat</button>
             </div>
         </div>
     </div>
 
-    <script>
-        // Get DOM elements
-        const messagesEl = document.getElementById('messages');
+    <!-- Main Layout -->
+    <div class="flex h-screen overflow-hidden">
+        <!-- Mobile Sidebar Overlay -->
+        <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden"></div>
         
-        // --- Chat history logic ---
-        let chatHistory = [];
-        let isTyping = false;
+        <!-- Mobile Sidebar -->
+        <aside id="projectSidebar" class="fixed inset-y-0 left-0 w-80 bg-dark-200 border-r border-dark-300 transform -translate-x-full transition-transform duration-300 ease-in-out md:hidden z-50">
+            <div class="flex justify-between items-center p-4 border-b border-dark-300">
+                <h3 class="text-xl font-semibold">Generated Files</h3>
+                <button id="closeSidebar" class="p-2 hover:bg-dark-300 rounded-lg transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="p-6">
+                <div class="space-y-3">
+                    {% for file in user_files %}
+                    <div class="group relative bg-dark-300 rounded-xl transition-all hover:bg-dark-400">
+                        <button class="file-content-btn w-full text-left block p-4 text-gray-200" 
+                                data-file="{{ file }}">
+                            <div class="flex items-center gap-3">
+                                <svg class="w-5 h-5 text-accent-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                <span class="text-sm font-medium">{{ file }}</span>
+                            </div>
+                        </button>
+                        <button class="delete-file absolute right-3 top-1/2 -translate-y-1/2 p-2 opacity-0 group-hover:opacity-100 hover:bg-accent-danger/20 rounded-lg transition-all"
+                                data-filename="{{ file }}">
+                            <svg class="w-4 h-4 text-accent-danger" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    </div>
+                    {% endfor %}
+                    {% if not user_files %}
+                    <div class="p-4 bg-dark-300 rounded-xl text-gray-400 text-sm">No files yet</div>
+                    {% endif %}
+                </div>
+            </div>
+        </aside>
 
+        <!-- Generated Files Sidebar (Desktop) -->
+        <aside class="w-80 bg-dark-200 border-r border-dark-300 hidden md:flex flex-col">
+            <div class="p-6">
+                <h3 class="text-xl font-semibold mb-6">Generated Files</h3>
+                <div class="space-y-3">
+                    {% for file in user_files %}
+                    <div class="group relative bg-dark-300 rounded-xl transition-all hover:bg-dark-400">
+                        <button class="file-content-btn w-full text-left block p-4 text-gray-200" 
+                                data-file="{{ file }}">
+                            <div class="flex items-center gap-3">
+                                <svg class="w-5 h-5 text-accent-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                <span class="text-sm font-medium">{{ file }}</span>
+                            </div>
+                        </button>
+                        <button class="delete-file absolute right-3 top-1/2 -translate-y-1/2 p-2 opacity-0 group-hover:opacity-100 hover:bg-accent-danger/20 rounded-lg transition-all"
+                                data-filename="{{ file }}">
+                            <svg class="w-4 h-4 text-accent-danger" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    </div>
+                    {% endfor %}
+                    {% if not user_files %}
+                    <div class="p-4 bg-dark-300 rounded-xl text-gray-400 text-sm">No files yet</div>
+                    {% endif %}
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 flex flex-col min-w-0 overflow-hidden bg-dark-100">
+            <!-- Header -->
+            <header class="bg-dark-200 border-b border-dark-300 flex-shrink-0">
+                <div class="max-w-7xl mx-auto">
+                    <div class="flex items-center justify-between p-4">
+                        <!-- Mobile menu button -->
+                        <button id="hamburgerBtn" class="md:hidden p-2 rounded-lg hover:bg-dark-300 transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                        </button>
+
+                        <!-- Navigation -->
+                        <nav class="flex items-center space-x-2">
+                            <a href="{{ url_for('index') }}" 
+                               class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-300 hover:text-white bg-dark-300 rounded-lg transition-colors hover:bg-dark-400">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                </svg>
+                                Home
+                            </a>
+                            <a href="{{ url_for('create') }}" 
+                               class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-300 hover:text-white bg-dark-300 rounded-lg transition-colors hover:bg-dark-400">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                </svg>
+                                Create
+                            </a>
+                        </nav>
+
+                        <!-- Model Selector -->
+                        <div class="relative z-10">
+                            <button id="modelDropdown" 
+                                    class="inline-flex items-center gap-3 px-4 py-2 text-sm font-medium bg-dark-300 hover:bg-dark-400 rounded-lg transition-colors min-w-[200px] border border-dark-400 focus:outline-none focus:ring-2 focus:ring-accent-primary focus:border-transparent">
+                                <svg class="w-5 h-5 text-accent-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                                <span id="selectedModel" class="flex-1 text-left text-gray-300">Select Model</span>
+                                <svg class="w-5 h-5 text-gray-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" id="dropdownArrow">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                            <div id="dropdownMenu" class="hidden absolute right-0 mt-2 w-full bg-dark-200 rounded-lg shadow-soft border border-dark-300 overflow-hidden z-50">
+                                <!-- Services will be dynamically loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Messages Container -->
+            <div class="flex-1 overflow-hidden relative">
+                <div id="messages" class="absolute inset-0 overflow-y-auto">
+                    <div class="max-w-3xl mx-auto p-6 space-y-6">
+                        <!-- Messages will be added here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="bg-dark-200 border-t border-dark-300 p-6 flex-shrink-0">
+                <div class="max-w-3xl mx-auto space-y-4">
+                    <div class="flex gap-3">
+                        <input type="text" id="messageInput" 
+                               class="flex-1 px-6 py-3 bg-dark-300 rounded-xl text-white placeholder-gray-400 border border-dark-400 focus:outline-none focus:ring-2 focus:ring-accent-primary focus:border-transparent transition-all"
+                               placeholder="Type your message…" disabled>
+                        <button id="sendBtn" 
+                                class="px-6 py-3 bg-accent-primary hover:bg-accent-secondary disabled:bg-dark-400 disabled:text-gray-500 rounded-xl font-medium transition-colors flex items-center gap-2"
+                                disabled>
+                            <span>Send</span>
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                        </button>
+                    </div>
+                    <button id="clearBtn" 
+                            class="w-full px-6 py-3 border border-dark-400 text-gray-400 hover:text-white hover:bg-dark-300 rounded-xl transition-colors disabled:opacity-50 text-sm font-medium"
+                            disabled>Clear Chat</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script>
         // Service configuration
         const servicesConfig = JSON.parse('{{ config|tojson|safe }}');
-
-        // Load services configuration
-        function loadServicesConfig() {
-            try {
-                if (!servicesConfig || !servicesConfig.services || !servicesConfig.services.length) {
-                    const dropdownMenu = document.getElementById('dropdownMenu');
-                    dropdownMenu.innerHTML = `
-                        <div class="p-4 text-center text-gray-400">
-                            <div class="animate-spin inline-block w-6 h-6 border-2 border-current border-t-transparent rounded-full mb-2"></div>
-                            <div>Loading services...</div>
-                        </div>
-                    `;
-                    return;
-                }
-                populateServiceDropdown();
-            } catch (error) {
-                console.error('Error loading services configuration:', error);
-                const dropdownMenu = document.getElementById('dropdownMenu');
-                dropdownMenu.innerHTML = `
-                    <div class="p-4 text-center text-red-400">
-                        Error loading services. Please try again.
-                    </div>
-                `;
-            }
-        }
-
-        // Populate service dropdown from configuration
-        function populateServiceDropdown() {
-            const dropdownMenu = document.getElementById('dropdownMenu');
-            dropdownMenu.innerHTML = ''; // Clear existing items
-
-            servicesConfig.services.forEach(service => {
-                const serviceElement = document.createElement('div');
-                serviceElement.className = 'p-4 hover:bg-dark-400 cursor-pointer transition-colors first:rounded-t-lg last:rounded-b-lg border-b border-dark-300 last:border-0';
-                serviceElement.dataset.model = service.id;
-                serviceElement.dataset.url = service.url[servicesConfig.environment];
-
-                serviceElement.innerHTML = `
-                    <div class="flex items-center gap-3">
-                        <div class="text-xl">${service.icon}</div>
-                        <div class="flex-1">
-                            <div class="font-medium text-white">${service.name}</div>
-                            <div class="text-sm text-gray-400">${service.description}</div>
-                        </div>
-                    </div>
-                `;
-
-                dropdownMenu.appendChild(serviceElement);
-            });
-
-            // Reattach click handlers
-            attachDropdownHandlers();
-        }
-
-        // Attach click handlers to dropdown items
-        function attachDropdownHandlers() {
-            document.querySelectorAll('#dropdownMenu > div').forEach(item => {
-                if (!item.dataset.model) return; // Skip if not a service item (like loading/error messages)
-                
-                item.addEventListener('click', () => {
-                    const model = item.dataset.model;
-                    const url = item.dataset.url;
-                    
-                    // Update selected model
-                    selectedModel = model;
-                    selectedUrl = url;
-                    selectedModelText.textContent = item.querySelector('.font-medium').textContent;
-
-                    console.log("Selected model:", selectedModel);
-                    console.log("Selected URL:", selectedUrl);
-
-                    // Update active states
-                    document.querySelectorAll('#dropdownMenu > div').forEach(i => {
-                        i.classList.remove('bg-dark-400');
-                    });
-                    item.classList.add('bg-dark-400');
-
-                    // Enable input and buttons
-                    messageInput.disabled = false;
-                    sendBtn.disabled = false;
-                    clearBtn.disabled = false;
-
-                    // Close dropdown
-                    dropdownMenu.classList.add('hidden');
-
-                    // Clear chat and show welcome message
-                    chatHistory = [];
-                    saveChatHistory();
-                    renderChatHistory();
-                    addMessage(`Using ${selectedModelText.textContent}. How can I assist you today?`, "bot");
-
-                    if(selectedModel === "html_service") {
-                        // set textbox to "Create something"
-                        messageInput.value = "Create me a simple todo list app. I want to be able to add, edit and delete tasks.";
-                        updateSendButtonState();
-                    }
-                });
-            });
-        }
-
-        // Load services configuration on page load
-        document.addEventListener("DOMContentLoaded", () => {
-            loadServicesConfig();
-            chatHistory = [];
-            saveChatHistory();
-            renderChatHistory();
-            addMessage("Welcome! Please select a model to begin.", "bot");
-        });
-
-        // Service URLs mapping
-        const serviceUrls = {
-            'service1': 'https://my-assistant.co.za/service1/query',
-            'base_chat':  'http://127.0.0.1:5002/query', //'https://my-assistant.co.za/base_chat/query',
-            'chatgpt_service': 'https://my-assistant.co.za/chatgpt_service/query',
-            'data_analyser': 'https://my-assistant.co.za/data_analyser/query',
-            'html_service': 'https://my-assistant.co.za/html_service/query'
-        };
-
-        // Load chat history from localStorage
-        function loadChatHistory() {
-            const saved = localStorage.getItem("chatHistory");
-            if (saved) {
-                chatHistory = JSON.parse(saved);
-                renderChatHistory();
-            }
-        }
-
-        // Save chat history to localStorage
-        function saveChatHistory() {
-            localStorage.setItem("chatHistory", JSON.stringify(chatHistory));
-        }
-
-        // Show typing indicator
-        function showTypingIndicator() {
-            if (isTyping) return;
-            isTyping = true;
-            const indicator = document.createElement("div");
-            indicator.id = "typingIndicator";
-            indicator.className = "flex gap-1 p-3 w-fit";
-            indicator.innerHTML = `
-                <div class="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
-                <div class="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
-                <div class="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style="animation-delay: 0.4s"></div>
-            `;
-            messagesEl.appendChild(indicator);
-            messagesEl.scrollTop = messagesEl.scrollHeight;
-        }
-
-        // Hide typing indicator
-        function hideTypingIndicator() {
-            if (!isTyping) return;
-            isTyping = false;
-            const indicator = document.getElementById("typingIndicator");
-            if (indicator) indicator.remove();
-        }
-
-        // Render all messages from chatHistory
-        function renderChatHistory() {
-            messagesEl.innerHTML = "";
-            chatHistory.forEach(msg => {
-                addMessage(msg.text, msg.sender, false);
-            });
-        }
-
-        // Add a message to the chat
-        function addMessage(text, sender = "user", save = true) {
-            const msg = document.createElement("div");
-            msg.className = `max-w-[75%] p-4 rounded-2xl ${
-                sender === "user" 
-                    ? "ml-auto bg-gradient-to-r from-blue-600 to-blue-700 rounded-br-lg" 
-                    : "bg-dark-200 border border-dark-300 rounded-bl-lg"
-            }`;
-            
-            // Use marked.js to render markdown
-            msg.innerHTML = marked.parse(text);
-            
-            // Apply syntax highlighting to code blocks
-            msg.querySelectorAll('pre code').forEach((block) => {
-                hljs.highlightBlock(block);
-            });
-            
-            // Style code blocks
-            msg.querySelectorAll('pre').forEach((block) => {
-                block.className = 'bg-dark-100 p-3 rounded-lg my-2 overflow-x-auto';
-            });
-            
-            messagesEl.appendChild(msg);
-            messagesEl.scrollTop = messagesEl.scrollHeight;
-            
-            if (save) {
-                chatHistory.push({ text, sender });
-                saveChatHistory();
-            }
-        }
-
-        // --- Model selection logic ---
-        const modelDropdown = document.getElementById('modelDropdown');
-        const dropdownMenu = document.getElementById('dropdownMenu');
-        const selectedModelText = document.getElementById('selectedModel');
-        const messageInput = document.getElementById('messageInput');
-        const sendBtn = document.getElementById('sendBtn');
-        const clearBtn = document.getElementById('clearBtn');
-
+        
+        // Global variables
+        let chatHistory = [];
+        let isTyping = false;
         let selectedModel = null;
         let selectedUrl = null;
 
-        // Toggle dropdown
-        modelDropdown.addEventListener('click', () => {
-            dropdownMenu.classList.toggle('hidden');
-        });
+        // DOM Elements - declare outside DOMContentLoaded to avoid redeclaration
+        let messagesEl;
+        let fileContentModal;
+        let modalContent;
+        let fileContentTitle;
+        let fileContentPreview;
+        let closeFileContentModal;
+        let modelDropdown;
+        let dropdownMenu;
+        let selectedModelText;
+        let messageInput;
+        let sendBtn;
+        let clearBtn;
 
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!modelDropdown.contains(e.target) && !dropdownMenu.contains(e.target)) {
-                dropdownMenu.classList.add('hidden');
-            }
-        });
+        // Initialize everything when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize DOM elements
+            messagesEl = document.getElementById('messages');
+            fileContentModal = document.getElementById('fileContentModal');
+            modalContent = document.getElementById('modalContent');
+            fileContentTitle = document.getElementById('fileContentTitle');
+            fileContentPreview = document.getElementById('fileContentPreview');
+            closeFileContentModal = document.getElementById('closeFileContentModal');
+            modelDropdown = document.getElementById('modelDropdown');
+            dropdownMenu = document.getElementById('dropdownMenu');
+            selectedModelText = document.getElementById('selectedModel');
+            messageInput = document.getElementById('messageInput');
+            sendBtn = document.getElementById('sendBtn');
+            clearBtn = document.getElementById('clearBtn');
 
-        // Update send button state
-        function updateSendButtonState() {
-            sendBtn.disabled = !messageInput.value.trim() || !selectedModel;
-        }
-
-        // Enable/disable send button based on input
-        messageInput.addEventListener("input", updateSendButtonState);
-
-        // Handle send button click
-        sendBtn.addEventListener("click", async () => {
-            const text = messageInput.value.trim();
-            if (!text || !selectedUrl) return;
-            
-            addMessage(text, "user");
-            messageInput.value = "";
-            updateSendButtonState();
-            showTypingIndicator();
-
-            try {
-                console.log(`Sending query to ${selectedModel}`);
-                console.log("Query:", text);
-                console.log("URL:", selectedUrl);
-                
-                const response = await fetch(selectedUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ query: text })
+            // Toggle dropdown
+            if (modelDropdown && dropdownMenu) {
+                modelDropdown.addEventListener('click', () => {
+                    dropdownMenu.classList.toggle('hidden');
+                    // Rotate arrow when dropdown is open
+                    const arrow = document.getElementById('dropdownArrow');
+                    if (arrow) {
+                        arrow.style.transform = dropdownMenu.classList.contains('hidden') ? '' : 'rotate(180deg)';
+                    }
                 });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                hideTypingIndicator();
 
-                console.log("Response:", data);
-                if(selectedModel === "html_service"){
-                    // get html from data.response
-                    const html = data.response;
-                    
-                    // Show preview modal
-                    const previewModal = document.getElementById('previewModal');
-                    const previewContent = document.getElementById('previewContent');
-                    const closePreviewModal = document.getElementById('closePreviewModal');
-                    const closePreview = document.getElementById('closePreview');
-                    const saveFile = document.getElementById('saveFile');
-                    const filename = document.getElementById('filename');
-                    
-                    // Set up preview iframe
-                    previewContent.innerHTML = `<iframe class="w-full h-full border-0" srcdoc="${html.replace(/"/g, '&quot;')}"></iframe>`;
-                    
+                // Close dropdown when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (!modelDropdown.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                        dropdownMenu.classList.add('hidden');
+                        // Reset arrow rotation
+                        const arrow = document.getElementById('dropdownArrow');
+                        if (arrow) {
+                            arrow.style.transform = '';
+                        }
+                    }
+                });
+            }
+
+            // Function to show modal with animation
+            function showModal() {
+                if (!fileContentModal) return;
+                fileContentModal.classList.remove('hidden');
+                // Trigger reflow
+                fileContentModal.offsetHeight;
+                fileContentModal.classList.remove('opacity-0');
+                if (modalContent) {
+                    modalContent.classList.remove('opacity-0', 'translate-y-4');
+                }
+            }
+
+            // Function to hide modal with animation
+            function hideModal() {
+                if (!fileContentModal) return;
+                fileContentModal.classList.add('opacity-0');
+                if (modalContent) {
+                    modalContent.classList.add('opacity-0', 'translate-y-4');
+                }
+                setTimeout(() => {
+                    fileContentModal.classList.add('hidden');
+                    if (fileContentPreview) {
+                        fileContentPreview.innerHTML = ''; // Clear content
+                    }
+                }, 300);
+            }
+
+            // Handle file content viewing
+            async function viewFileContent(filename) {
+                if (!fileContentModal || !fileContentPreview || !fileContentTitle) {
+                    console.error('Required modal elements not found');
+                    return;
+                }
+
+                try {
+                    const filePath = `/static/projects/{{ session['user_id'] }}/${filename}`;
+                    const response = await fetch(filePath);
+                    const content = await response.text();
+
+                    // Set modal title
+                    fileContentTitle.textContent = filename;
+
+                    // Create and setup iframe
+                    const iframe = document.createElement('iframe');
+                    iframe.className = 'w-full h-full border-0';
+                    fileContentPreview.innerHTML = '';
+                    fileContentPreview.appendChild(iframe);
+
+                    // Write content to iframe
+                    const iframeDoc = iframe.contentWindow.document;
+                    iframeDoc.open();
+                    iframeDoc.write(content);
+                    iframeDoc.close();
+
                     // Show modal
-                    previewModal.classList.remove('hidden');
-                    
-                    // Handle close
-                    const closeModal = () => {
-                        previewModal.classList.add('hidden');
-                        filename.value = '';
-                    };
-                    
-                    closePreviewModal.addEventListener('click', closeModal);
-                    closePreview.addEventListener('click', closeModal);
-                    
-                    // Handle save
-                    saveFile.addEventListener('click', async () => {
-                        if (!filename.value.trim()) {
-                            addMessage("Please enter a filename", "bot");
+                    showModal();
+                } catch (error) {
+                    console.error('Error loading file:', error);
+                    addMessage(`Error loading file: ${error.message}`, "bot");
+                }
+            }
+
+            // Initialize modal events
+            function initializeModalEvents() {
+                if (!fileContentModal || !closeFileContentModal) {
+                    console.error('Modal elements not found');
+                    return;
+                }
+
+                // Close modal when clicking close button
+                closeFileContentModal.addEventListener('click', hideModal);
+
+                // Close modal when clicking outside
+                fileContentModal.addEventListener('click', (e) => {
+                    if (e.target === fileContentModal) {
+                        hideModal();
+                    }
+                });
+
+                // Close modal on escape key
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && !fileContentModal.classList.contains('hidden')) {
+                        hideModal();
+                    }
+                });
+
+                // Handle file content button clicks
+                document.querySelectorAll('.file-content-btn').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const filename = button.dataset.file;
+                        if (filename) {
+                            viewFileContent(filename);
+                        }
+                        // close hamburger menu
+                        hamburgerBtn.click();
+                    });
+                });
+            }
+
+            // Initialize file deletion
+            function initializeFileDeletion() {
+                document.querySelectorAll('.delete-file').forEach(button => {
+                    button.addEventListener('click', async (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        const filename = button.dataset.filename;
+                        if (!filename || !confirm(`Are you sure you want to delete ${filename}?`)) {
                             return;
                         }
                         
                         try {
-                            const permanentSaveResponse = await fetch('/save_html', {
+                            const response = await fetch('/delete_file', {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
                                 },
-                                body: JSON.stringify({ 
-                                    html: html, 
-                                    save: true,
-                                    filename: filename.value.trim().endsWith('.html') 
-                                        ? filename.value.trim() 
-                                        : filename.value.trim() + '.html'
-                                })
+                                body: JSON.stringify({ filename: filename })
                             });
                             
-                            const permanentSaveData = await permanentSaveResponse.json();
-                            if (permanentSaveData.saved) {
-                                addMessage(`HTML app saved successfully as ${filename.value}!`, "bot");
-                                closeModal();
+                            const data = await response.json();
+                            if (response.ok) {
+                                // Remove the file element from the UI
+                                const fileElement = button.closest('.group');
+                                if (fileElement) {
+                                    fileElement.remove();
+                                }
+                                addMessage(`File ${filename} deleted successfully`, "bot");
+                                
+                                // If no files left, show the "No files yet" message
+                                const filesList = document.querySelector('.space-y-3');
+                                if (filesList && !filesList.querySelector('.group')) {
+                                    filesList.innerHTML = '<div class="p-4 bg-dark-300 rounded-xl text-gray-400 text-sm">No files yet</div>';
+                                }
+                            } else {
+                                addMessage(`Error deleting file: ${data.error}`, "bot");
                             }
                         } catch (error) {
-                            addMessage("Error saving HTML app: " + error.message, "bot");
+                            addMessage(`Error deleting file: ${error.message}`, "bot");
                         }
                     });
-                    
-                    // Add message with link after preview is shown
-                    addMessage(`HTML generated successfully! You can preview and save it now.`, "bot");
-                } else {
-                    addMessage(data.response || JSON.stringify(data), "bot");
+                });
+            }
+
+            // Load services configuration
+            function loadServicesConfig() {
+                try {
+                    if (!servicesConfig || !servicesConfig.services || !servicesConfig.services.length) {
+                        if (dropdownMenu) {
+                            dropdownMenu.innerHTML = `
+                                <div class="p-4 text-center text-gray-400">
+                                    <div class="animate-spin inline-block w-6 h-6 border-2 border-current border-t-transparent rounded-full mb-2"></div>
+                                    <div>Loading services...</div>
+                                </div>
+                            `;
+                        }
+                        return;
+                    }
+                    populateServiceDropdown();
+                    // Select first service by default
+                    const firstService = servicesConfig.services[0];
+                    if (firstService) {
+                        selectService(firstService.id, firstService.url[servicesConfig.environment], firstService.name);
+                    }
+                } catch (error) {
+                    console.error('Error loading services configuration:', error);
+                    if (dropdownMenu) {
+                        dropdownMenu.innerHTML = `
+                            <div class="p-4 text-center text-red-400">
+                                Error loading services. Please try again.
+                            </div>
+                        `;
+                    }
+                }
+            }
+
+            // Function to select a service
+            function selectService(model, url, name) {
+                selectedModel = model;
+                selectedUrl = url;
+                if (selectedModelText) {
+                    selectedModelText.textContent = name;
                 }
 
-            } catch (error) {
-                hideTypingIndicator();
-                addMessage('Error: ' + error.message, "bot");
-            }
-        });
+                // Update active states in dropdown
+                document.querySelectorAll('#dropdownMenu > div').forEach(i => {
+                    i.classList.remove('bg-dark-400');
+                    if (i.dataset.model === model) {
+                        i.classList.add('bg-dark-400');
+                    }
+                });
 
-        // Handle Enter key press
-        messageInput.addEventListener("keydown", (e) => {
-            if (e.key === "Enter" && !e.shiftKey && !sendBtn.disabled) {
-                e.preventDefault();
-                sendBtn.click();
-            }
-        });
+                // Enable input and buttons
+                if (messageInput) messageInput.disabled = false;
+                if (sendBtn) sendBtn.disabled = false;
+                if (clearBtn) clearBtn.disabled = false;
 
-        // Handle clear chat button
-        clearBtn.addEventListener("click", () => {
+                // Close dropdown
+                if (dropdownMenu) dropdownMenu.classList.add('hidden');
+
+                // Clear chat and show welcome message
+                chatHistory = [];
+                saveChatHistory();
+                renderChatHistory();
+                addMessage(`Using ${name}. How can I assist you today?`, "bot");
+
+                if(selectedModel === "html_service" && messageInput) {
+                    messageInput.value = "Create me a simple todo list app. I want to be able to add, edit and delete tasks.";
+                    updateSendButtonState();
+                }
+            }
+
+            // Populate service dropdown from configuration
+            function populateServiceDropdown() {
+                if (!dropdownMenu) return;
+                
+                dropdownMenu.innerHTML = ''; // Clear existing items
+
+                servicesConfig.services.forEach(service => {
+                    const serviceElement = document.createElement('div');
+                    serviceElement.className = 'p-4 hover:bg-dark-400 cursor-pointer transition-colors first:rounded-t-lg last:rounded-b-lg border-b border-dark-300 last:border-0';
+                    serviceElement.dataset.model = service.id;
+                    serviceElement.dataset.url = service.url[servicesConfig.environment];
+                    serviceElement.dataset.name = service.name;
+
+                    serviceElement.innerHTML = `
+                        <div class="flex items-center gap-3">
+                            <div class="text-xl">${service.icon}</div>
+                            <div class="flex-1">
+                                <div class="font-medium text-white">${service.name}</div>
+                                <div class="text-sm text-gray-400">${service.description}</div>
+                            </div>
+                            <div class="w-4 h-4 rounded-full border-2 border-accent-primary ${service.id === selectedModel ? 'bg-accent-primary' : ''}"></div>
+                        </div>
+                    `;
+
+                    dropdownMenu.appendChild(serviceElement);
+                });
+
+                // Attach click handlers
+                attachDropdownHandlers();
+            }
+
+            // Attach click handlers to dropdown items
+            function attachDropdownHandlers() {
+                document.querySelectorAll('#dropdownMenu > div').forEach(item => {
+                    if (!item.dataset.model) return; // Skip if not a service item
+                    
+                    item.addEventListener('click', () => {
+                        selectService(
+                            item.dataset.model,
+                            item.dataset.url,
+                            item.dataset.name
+                        );
+                    });
+                });
+            }
+
+            // Initialize everything
+            loadServicesConfig();
+            initializeModalEvents();
+            initializeFileDeletion();
             chatHistory = [];
             saveChatHistory();
             renderChatHistory();
-            addMessage("Chat cleared. How can I assist you today?", "bot");
-        });
+            if (messagesEl) {
+                addMessage("Welcome! Please select a model to begin.", "bot");
+            }
 
-        // Add this at the beginning of your script section
-        const hamburgerBtn = document.getElementById('hamburgerBtn');
-        const projectSidebar = document.getElementById('projectSidebar');
-        const closeSidebar = document.getElementById('closeSidebar');
-        const sidebarOverlay = document.getElementById('sidebarOverlay');
+            // Service URLs mapping
+            const serviceUrls = {
+                'service1': 'https://my-assistant.co.za/service1/query',
+                'base_chat':  'http://127.0.0.1:5002/query', //'https://my-assistant.co.za/base_chat/query',
+                'chatgpt_service': 'https://my-assistant.co.za/chatgpt_service/query',
+                'data_analyser': 'https://my-assistant.co.za/data_analyser/query',
+                'html_service': 'https://my-assistant.co.za/html_service/query'
+            };
 
-        // Toggle sidebar
-        function toggleSidebar() {
-            projectSidebar.classList.toggle('-translate-x-full');
-            sidebarOverlay.classList.toggle('hidden');
-        }
+            // Load chat history from localStorage
+            function loadChatHistory() {
+                const saved = localStorage.getItem("chatHistory");
+                if (saved) {
+                    chatHistory = JSON.parse(saved);
+                    renderChatHistory();
+                }
+            }
 
-        hamburgerBtn.addEventListener('click', toggleSidebar);
-        closeSidebar.addEventListener('click', toggleSidebar);
-        sidebarOverlay.addEventListener('click', toggleSidebar);
+            // Save chat history to localStorage
+            function saveChatHistory() {
+                localStorage.setItem("chatHistory", JSON.stringify(chatHistory));
+            }
 
-        // Handle file clicks
-        document.querySelectorAll('.file-item').forEach(item => {
-            item.addEventListener('click', async () => {
-                const path = item.dataset.path;
+            // Show typing indicator
+            function showTypingIndicator() {
+                if (isTyping) return;
+                isTyping = true;
+                const indicator = document.createElement("div");
+                indicator.id = "typingIndicator";
+                indicator.className = "flex gap-1 p-3 w-fit";
+                indicator.innerHTML = `
+                    <div class="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
+                    <div class="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                    <div class="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style="animation-delay: 0.4s"></div>
+                `;
+                messagesEl.appendChild(indicator);
+                messagesEl.scrollTop = messagesEl.scrollHeight;
+            }
+
+            // Hide typing indicator
+            function hideTypingIndicator() {
+                if (!isTyping) return;
+                isTyping = false;
+                const indicator = document.getElementById("typingIndicator");
+                if (indicator) indicator.remove();
+            }
+
+            // Render all messages from chatHistory
+            function renderChatHistory() {
+                messagesEl.innerHTML = "";
+                chatHistory.forEach(msg => {
+                    addMessage(msg.text, msg.sender, false);
+                });
+            }
+
+            // Add a message to the chat
+            function addMessage(text, sender = "user", save = true) {
+                const msg = document.createElement("div");
+                msg.className = `max-w-[75%] p-4 rounded-2xl mt-5 ${
+                    sender === "user" 
+                        ? "ml-auto bg-gradient-to-r from-blue-600 to-blue-700 rounded-br-lg" 
+                        : "bg-dark-200 border border-dark-300 rounded-bl-lg"
+                }`;
+                
+                // Use marked.js to render markdown
+                msg.innerHTML = marked.parse(text);
+                
+                // Apply syntax highlighting to code blocks
+                msg.querySelectorAll('pre code').forEach((block) => {
+                    hljs.highlightBlock(block);
+                });
+                
+                // Style code blocks
+                msg.querySelectorAll('pre').forEach((block) => {
+                    block.className = 'bg-dark-100 p-3 rounded-lg my-2 overflow-x-auto';
+                });
+                
+                messagesEl.appendChild(msg);
+                messagesEl.scrollTop = messagesEl.scrollHeight;
+                
+                if (save) {
+                    chatHistory.push({ text, sender });
+                    saveChatHistory();
+                }
+            }
+
+            // Update send button state
+            function updateSendButtonState() {
+                sendBtn.disabled = !messageInput.value.trim() || !selectedModel;
+            }
+
+            // Enable/disable send button based on input
+            messageInput.addEventListener("input", updateSendButtonState);
+
+            // Handle send button click
+            sendBtn.addEventListener("click", async () => {
+                const text = messageInput.value.trim();
+                if (!text || !selectedUrl) return;
+                
+                addMessage(text, "user");
+                messageInput.value = "";
+                updateSendButtonState();
+                showTypingIndicator();
+
                 try {
-                    const response = await fetch(`/get_file_content?path=${encodeURIComponent(path)}`);
-                    const data = await response.json();
+                    console.log(`Sending query to ${selectedModel}`);
+                    console.log("Query:", text);
+                    console.log("URL:", selectedUrl);
                     
-                    if (response.ok) {
-                        // Create a message with the file content
-                        addMessage(`File: ${path}\n\`\`\`\n${data.content}\n\`\`\``, "bot");
-                    } else {
-                        addMessage(`Error loading file: ${data.error}`, "bot");
+                    const response = await fetch(selectedUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ query: text })
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
                     }
+                    
+                    const data = await response.json();
+                    hideTypingIndicator();
+
+                    console.log("Response:", data);
+                    if(selectedModel === "html_service"){
+                        // get html from data.response
+                        const html = data.response;
+                        
+                        // Show preview modal
+                        const previewModal = document.getElementById('previewModal');
+                        const previewContent = document.getElementById('previewContent');
+                        const closePreviewModal = document.getElementById('closePreviewModal');
+                        const closePreview = document.getElementById('closePreview');
+                        const saveFile = document.getElementById('saveFile');
+                        const filename = document.getElementById('filename');
+                        
+                        // Set up preview iframe
+                        previewContent.innerHTML = `<iframe class="w-full h-full border-0" srcdoc="${html.replace(/"/g, '&quot;')}"></iframe>`;
+                        
+                        // Show modal
+                        previewModal.classList.remove('hidden');
+                        
+                        // Handle close
+                        const closeModal = () => {
+                            previewModal.classList.add('hidden');
+                            filename.value = '';
+                        };
+                        
+                        closePreviewModal.addEventListener('click', closeModal);
+                        closePreview.addEventListener('click', closeModal);
+                        
+                        // Handle save
+                        saveFile.addEventListener('click', async () => {
+                            if (!filename.value.trim()) {
+                                addMessage("Please enter a filename", "bot");
+                                return;
+                            }
+                            
+                            try {
+                                const permanentSaveResponse = await fetch('/save_html', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                    },
+                                    body: JSON.stringify({ 
+                                        html: html, 
+                                        save: true,
+                                        filename: filename.value.trim().endsWith('.html') 
+                                            ? filename.value.trim() 
+                                            : filename.value.trim() + '.html'
+                                    })
+                                });
+                                
+                                const permanentSaveData = await permanentSaveResponse.json();
+                                if (permanentSaveData.saved) {
+                                    addMessage(`HTML app saved successfully as ${filename.value}!`, "bot");
+                                    closeModal();
+                                }
+                            } catch (error) {
+                                addMessage("Error saving HTML app: " + error.message, "bot");
+                            }
+                        });
+                        
+                        // Add message with link after preview is shown
+                        addMessage(`HTML generated successfully! You can preview and save it now.`, "bot");
+                    } else {
+                        addMessage(data.response || JSON.stringify(data), "bot");
+                    }
+
                 } catch (error) {
-                    addMessage(`Error loading file: ${error.message}`, "bot");
+                    hideTypingIndicator();
+                    addMessage('Error: ' + error.message, "bot");
                 }
             });
+
+            // Handle Enter key press
+            messageInput.addEventListener("keydown", (e) => {
+                if (e.key === "Enter" && !e.shiftKey && !sendBtn.disabled) {
+                    e.preventDefault();
+                    sendBtn.click();
+                }
+            });
+
+            // Handle clear chat button
+            clearBtn.addEventListener("click", () => {
+                chatHistory = [];
+                saveChatHistory();
+                renderChatHistory();
+                addMessage("Chat cleared. How can I assist you today?", "bot");
+            });
+
+            // Add this at the beginning of your script section
+            const hamburgerBtn = document.getElementById('hamburgerBtn');
+            const projectSidebar = document.getElementById('projectSidebar');
+            const closeSidebar = document.getElementById('closeSidebar');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+            // Toggle sidebar
+            function toggleSidebar() {
+                projectSidebar.classList.toggle('-translate-x-full');
+                sidebarOverlay.classList.toggle('hidden');
+            }
+
+            hamburgerBtn.addEventListener('click', toggleSidebar);
+            closeSidebar.addEventListener('click', toggleSidebar);
+            sidebarOverlay.addEventListener('click', toggleSidebar);
         });
     </script>
 </body>

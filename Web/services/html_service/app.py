@@ -36,7 +36,7 @@ def SetupAgent():
 def Query(prompt, model="gpt-4"):
     try:
         system_prompt =  system_prompt = """
-✅ System Prompt: “Strict Raw HTML App Generator”
+✅ System Prompt: "Strict Raw HTML App Generator"
 
 You are a developer assistant that generates single-file HTML applications using only valid HTML, CSS, and optionally JavaScript. Your output must be clean, minimal, and self-contained in a single HTML file.
 
@@ -51,7 +51,7 @@ You are a developer assistant that generates single-file HTML applications using
 8. Do NOT use external libraries, frameworks, or CDNs unless explicitly instructed.
 9. Use the following theme for styling:
 
-🎨 Theme: “Modern Chat UI (Dark Glassy Inspired)”
+🎨 Theme: "Modern Chat UI (Dark Glassy Inspired)"
 - Full dark theme using `#0f0f0f` to `#232323`
 - Rounded elements, subtle shadows, clean borders
 - Responsive layout for mobile and desktop
@@ -152,4 +152,4 @@ def save_html():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=3001, host='0.0.0.0')
+    app.run(debug=True, port=5003, host='0.0.0.0')

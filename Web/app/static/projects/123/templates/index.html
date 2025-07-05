@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <!-- favicon -->
+  <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+  <title>My Assistant</title>
+  <style>
+    /* Reset & Base */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Roboto, sans-serif;
+      color: #222;
+      line-height: 1.6;
+      background: #fafafa;
+    }
+    a { text-decoration: none; color: inherit; }
+
+    /* Header */
+    header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(6px);
+      z-index: 100;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    header .logo { font-size: 1.25rem; font-weight: bold; }
+    header nav a {
+      margin-left: 2rem;
+      font-weight: 500;
+      position: relative;
+    }
+    header nav a::after {
+      content: '';
+      position: absolute;
+      left: 0; bottom: -4px;
+      width: 100%; height: 2px;
+      background: #4f9aff;
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s ease;
+    }
+    header nav a:hover::after {
+      transform: scaleX(1);
+    }
+
+    /* Hero */
+    .hero {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      min-height: 100vh;
+      padding: 0 1rem;
+      background: linear-gradient(135deg, #4f9aff 0%, #76d7ff 100%);
+      color: #fff;
+    }
+    .hero .inner {
+      max-width: 700px;
+    }
+    .hero h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      position: relative;
+      display: inline-block;
+    }
+    .hero h1::after {
+      content: '';
+      display: block;
+      width: 60%;
+      height: 4px;
+      background: #fff;
+      margin: 0.5rem auto 0;
+      border-radius: 2px;
+    }
+    .hero p {
+      font-size: 1.125rem;
+      margin-bottom: 2rem;
+      opacity: 0.9;
+    }
+    .hero .btn {
+      padding: 0.75rem 2rem;
+      background: #fff;
+      color: #4f9aff;
+      font-weight: 600;
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+    .hero .btn:hover {
+      background: #f0f0f0;
+      transform: translateY(-2px);
+    }
+
+    /* Features */
+    .features {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      padding: 4rem 2rem;
+      background: #fff;
+    }
+    .feature {
+      flex: 1 1 280px;
+      margin: 1rem;
+      padding-bottom: 2rem;
+      text-align: center;
+      border-bottom: 3px solid #e0e0e0;
+    }
+    .feature h3 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+      position: relative;
+    }
+    .feature h3::after {
+      content: '';
+      display: block;
+      width: 40px;
+      height: 3px;
+      background: #4f9aff;
+      margin: 0.5rem auto 0;
+    }
+    .feature p {
+      margin-top: 1rem;
+      color: #555;
+    }
+
+    /* Call to Action */
+    .cta {
+      text-align: center;
+      padding: 3rem 2rem;
+      background: #f5f7fa;
+    }
+    .cta h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+    .cta .btn-secondary {
+      padding: 0.75rem 2rem;
+      background: #4f9aff;
+      color: #fff;
+      border: none;
+      border-radius: 999px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .cta .btn-secondary:hover {
+      background: #3a7dd9;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      font-size: 0.875rem;
+      color: #888;
+    }
+
+    /* Sidebar nav */
+    .sidebar {
+      position: absolute;
+      top: 0; left: -240px;
+      width: 240px; height: 100%;
+      background: #fff;
+      box-shadow: 2px 0 16px rgba(0,0,0,0.08);
+      transition: left 0.3s cubic-bezier(.4,0,.2,1);
+      padding-top: 64px;
+      border-top-right-radius: 16px;
+      border-bottom-right-radius: 16px;
+      z-index: 200;
+    }
+    .sidebar.open { left: 0; }
+    .sidebar a {
+      display: block;
+      padding: 16px 28px;
+      color: #222;
+      text-decoration: none;
+      font-size: 1.08rem;
+      border-bottom: 1px solid #f3f3f3;
+      transition: background 0.18s;
+      border-radius: 8px;
+      margin: 0 8px 4px 8px;
+    }
+    .sidebar a:hover { background: #f7f7fa; }
+
+    .menu-btn {
+      font-size: 26px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      color: inherit;
+      margin-right: 8px;
+      transition: background 0.18s;
+      border-radius: 6px;
+      padding: 4px 8px;
+      display: inline-block;
+    }
+    .menu-btn:hover {
+      background: rgba(79,154,255,0.12);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 2.25rem; }
+      .features { flex-direction: column; align-items: center; }
+      header { padding: 1rem 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar Navigation -->
+  <nav class="sidebar" id="sidebar">
+    <a href="{{ url_for('index') }}">Home</a>
+    <a href="{{ url_for('create') }}">Create Application</a>
+  </nav>
+
+  <header>
+    <button class="menu-btn" id="menuBtn">&#9776;</button>
+    <div class="logo">My Assistant</div>
+    <nav>
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div class="inner">
+      <h1>Power Your Business with AI</h1>
+      <p>Seamless integration, lightning-fast inference, and easy-to-use APIs to supercharge your product.</p>
+      <button class="btn" onclick="window.location.href='{{ url_for('create') }}'">Get Started</button>
+      <button class="btn" onclick="window.location.href='{{ url_for('create') }}'">Create Application</button>
+    </div>
+  </section>
+
+  <section id="features" class="features">
+    <div class="feature">
+      <h3>Real-Time Chat</h3>
+      <p>Engage users with context-aware, conversational AI that responds instantly.</p>
+    </div>
+    <div class="feature">
+      <h3>Knowledge Aware</h3>
+      <p>Vectorize, Use your existing database.</p>
+    </div>
+    <div class="feature">
+      <h3>Create application using your business tools</h3>
+      <p>Train and deploy your own models or choose from our pre-trained library.</p>
+    </div>
+  </section>
+
+  <section class="cta">
+    <h2>Ready to accelerate with AI?</h2>
+    <button class="btn-secondary" onclick="window.location.href='{{ url_for('create') }}'">Start Your Trial</button>
+  </section>
+
+  <footer id="contact">
+    &copy; 2025 My Assistant • <a href="mailto:support@myassistant.co.za">support@myassistant.co.za</a>
+  </footer>
+  </footer>
+
+  <script>
+    // Sidebar toggle logic
+    const sidebar = document.getElementById('sidebar');
+    const menuBtn = document.getElementById('menuBtn');
+    menuBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('open');
+    });
+  </script>
+</body>
+</html>

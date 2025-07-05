@@ -2,18 +2,305 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create - My Assistant</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            font-family: "Segoe UI", "Roboto", Arial, sans-serif;
+            background: #0f0f0f;
+            color: #fff;
+        }
+
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            width: 100vw;
+            height: 100vh;
+            background: #181818;
+        }
+
+        .header {
+            flex: 0 0 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            background: #111;
+            border-bottom: 1px solid #232323;
+            box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.08);
+        }
+
+        .header span {
+            font-size: 1.25rem;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar {
+            display: flex;
+            gap: 18px;
+        }
+        .sidebar a {
+            color: #bbb;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 14px;
+            border-radius: 6px;
+            transition: background 0.2s, color 0.2s;
+        }
+        .sidebar a:hover,
+        .sidebar a:focus {
+            background: #232323;
+            color: #fff;
+        }
+
+        .messages {
+            flex: 1;
+            padding: 28px 24px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            background: #121212;
+            scrollbar-width: thin;
+            scrollbar-color: #232323 #181818;
+        }
+        .messages::-webkit-scrollbar {
+            width: 8px;
+        }
+        .messages::-webkit-scrollbar-thumb {
+            background: #232323;
+            border-radius: 4px;
+        }
+        .messages::-webkit-scrollbar-track {
+            background: #181818;
+        }
+
+        .message {
+            max-width: 75%;
+            padding: 16px 22px;
+            font-size: 1.08rem;
+            line-height: 1.7;
+            word-break: break-word;
+            border-radius: 18px;
+            position: relative;
+            box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background: linear-gradient(100deg, #353535 60%, #232323 100%);
+            color: #f0f0f0;
+            border-top-right-radius: 6px;
+            border-bottom-right-radius: 18px;
+        }
+
+        .message.bot {
+            align-self: flex-start;
+            background: #1e1e1e;
+            color: #e0e0e0;
+            border-top-left-radius: 6px;
+            border-bottom-left-radius: 18px;
+            border: 1px solid #232323;
+        }
+
+        .input-area {
+            display: flex;
+            padding: 18px 24px;
+            background: #111;
+            border-top: 1px solid #232323;
+            gap: 12px;
+        }
+
+        .input-area input {
+            flex: 1;
+            padding: 15px 22px;
+            border: none;
+            border-radius: 32px;
+            font-size: 1.05rem;
+            background: #232323;
+            color: #eee;
+            outline: none;
+            transition: background 0.2s;
+            box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.04);
+        }
+        .input-area input:focus {
+            background: #282828;
+        }
+
+        .input-area button {
+            padding: 0 22px;
+            background: linear-gradient(90deg, #fff 60%, #e0e0e0 100%);
+            color: #000;
+            font-weight: bold;
+            border-radius: 32px;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            min-height: 44px;
+            margin-left: 4px;
+            box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.06);
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+        }
+        .input-area button:hover {
+            background: linear-gradient(90deg, #e0e0e0 60%, #fff 100%);
+            color: #222;
+            box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.10);
+        }
+        .input-area button:disabled {
+            opacity: 0.4;
+            cursor: default;
+            background: #bbb;
+            color: #fff;
+        }
+
+        @media (max-width: 768px) {
+            .messages {
+                padding: 12px 4vw;
+                gap: 12px;
+            }
+            .input-area {
+                padding: 10px 4vw;
+                gap: 8px;
+            }
+            .message {
+                font-size: 0.98rem;
+                padding: 12px 12px;
+                max-width: 95%;
+            }
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+                padding: 10px 4vw;
+                height: auto;
+            }
+            .sidebar {
+                gap: 10px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Create Something</h1>
-    <p>This page will interact with the independent service.</p>
-    <a href="{{ url_for('index') }}">Back to Home</a>
+    <div class="chat-container">
+        <div class="header">
+            <nav class="sidebar">
+                <a href="{{ url_for('index') }}">Home</a>
+                <a href="{{ url_for('create') }}">Create</a>
+            </nav>
+            <span>Create Something</span>
+        </div>
 
-    <form action="/service1/create" method="post">
-        <input type="text" name="name" placeholder="Enter your name">
-        <button type="submit">Create</button>
-    </form>
+        <div class="messages" id="messages"></div>
 
-    <p>Response from service1: {{ response }}</p>
+        <div class="input-area">
+            <input type="text" id="messageInput" placeholder="Type your message…">
+            <button id="sendBtn" disabled>Send</button>
+        </div>
+    </div>
+
+    <script>
+        // --- Chat history logic ---
+        let chatHistory = [];
+
+        // Load chat history from localStorage
+        function loadChatHistory() {
+            const saved = localStorage.getItem("chatHistory");
+            if (saved) {
+                chatHistory = JSON.parse(saved);
+                renderChatHistory();
+            }
+        }
+
+        // Save chat history to localStorage
+        function saveChatHistory() {
+            localStorage.setItem("chatHistory", JSON.stringify(chatHistory));
+        }
+
+        // Render all messages from chatHistory
+        function renderChatHistory() {
+            messagesEl.innerHTML = "";
+            chatHistory.forEach(msg => {
+                addMessage(msg.text, msg.sender, false);
+            });
+        }
+
+        // Add a message to the chat
+        function addMessage(text, sender = "user", save = true) {
+            const msg = document.createElement("div");
+            msg.classList.add("message", sender);
+            msg.textContent = text;
+            messagesEl.appendChild(msg);
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+            if (save) {
+                chatHistory.push({ text, sender });
+                saveChatHistory();
+            }
+        }
+
+        // Initialize elements
+        const input = document.getElementById("messageInput");
+        const sendBtn = document.getElementById("sendBtn");
+        const messagesEl = document.getElementById("messages");
+
+        // Enable/disable send button based on input
+        input.addEventListener("input", () => {
+            sendBtn.disabled = !input.value.trim();
+        });
+
+        // Handle send button click
+        sendBtn.addEventListener("click", async () => {
+            const text = input.value.trim();
+            if (!text) return;
+            
+            addMessage(text, "user");
+            input.value = "";
+            sendBtn.disabled = true;
+
+            try {
+                // var url = 'http://127.0.0.1:5001/query';
+                url = 'http://service1:5001/query';
+                console.log("Sending query to service1");
+                console.log(text);
+                console.log("URL: ");
+                console.log(url);
+                // var url = "service1/query";
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query: text })
+                });
+                
+                const data = await response.json();
+                addMessage(data.response || JSON.stringify(data), "bot");
+            } catch (error) {
+                addMessage('Error: ' + error.message, "bot");
+            }
+        });
+
+        // Handle Enter key press
+        input.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" && !sendBtn.disabled) sendBtn.click();
+        });
+
+        // On page load
+        document.addEventListener("DOMContentLoaded", () => {
+            chatHistory = [];
+            saveChatHistory();
+            renderChatHistory();
+            addMessage("Welcome! How can I assist you today?", "bot");
+        });
+    </script>
 </body>
 </html>

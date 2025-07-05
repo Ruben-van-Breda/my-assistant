@@ -17,3 +17,4 @@ Services/data_analyser_service/secrets.txt
 /Services/data_analyser_service/venv
 Services/html_service/venv/**
 Services/html_service/secrets.txt
+Web/services/base_chat/secrets.txt

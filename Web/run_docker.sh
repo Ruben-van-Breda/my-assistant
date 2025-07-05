@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/bash
 # Build and run the Docker Compose stack with configurable port and service name
 
 # Set default values if not provided

@@ -16,6 +16,15 @@ services:
       - "5001:5000"
     networks:
       - app_network
+  
+
+
+  html_service:
+    build: ./services/html_service
+    ports:
+      - "5003:5003"
+    networks:
+      - app_network
 
   nginx:
     image: nginx:latest
@@ -28,6 +37,7 @@ services:
     depends_on:
       - app
       - service1
+      - html_service
     networks:
       - app_network
 

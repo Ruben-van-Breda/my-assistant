@@ -3,7 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create - My Assistant</title>
+    <title>Agent Chat</title>
+    <!-- Add marked.js for markdown support -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Add highlight.js for code syntax highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -19,11 +24,55 @@
             color: #fff;
         }
 
+        .main-container {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .files-sidebar {
+            flex: 0 0 250px;
+            background: #111;
+            border-right: 1px solid #232323;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .files-sidebar h3 {
+            color: #fff;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #232323;
+        }
+
+        .files-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .file-item {
+            padding: 10px;
+            background: #1e1e1e;
+            border-radius: 6px;
+            color: #e0e0e0;
+            text-decoration: none;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border: 1px solid #232323;
+        }
+
+        .file-item:hover {
+            background: #282828;
+            border-color: #444;
+        }
+
         .chat-container {
             display: flex;
             flex-direction: column;
-            width: 100vw;
-            height: 100vh;
+            flex: 1;
             background: #181818;
         }
 
@@ -38,16 +87,45 @@
             box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.08);
         }
 
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
         .header span {
             font-size: 1.25rem;
             font-weight: bold;
             letter-spacing: 0.5px;
         }
 
+        .model-selector {
+            padding: 8px 12px;
+            background: #232323;
+            border: 1px solid #333;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 0.9rem;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .model-selector:hover {
+            background: #282828;
+            border-color: #444;
+        }
+
+        .model-selector option {
+            background: #232323;
+            color: #fff;
+        }
+
         .sidebar {
             display: flex;
             gap: 18px;
         }
+
         .sidebar a {
             color: #bbb;
             text-decoration: none;
@@ -56,6 +134,7 @@
             border-radius: 6px;
             transition: background 0.2s, color 0.2s;
         }
+
         .sidebar a:hover,
         .sidebar a:focus {
             background: #232323;
@@ -73,13 +152,16 @@
             scrollbar-width: thin;
             scrollbar-color: #232323 #181818;
         }
+
         .messages::-webkit-scrollbar {
             width: 8px;
         }
+
         .messages::-webkit-scrollbar-thumb {
             background: #232323;
             border-radius: 4px;
         }
+
         .messages::-webkit-scrollbar-track {
             background: #181818;
         }
@@ -113,6 +195,54 @@
             border: 1px solid #232323;
         }
 
+        .message pre {
+            background: #0d0d0d;
+            padding: 12px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 8px 0;
+        }
+
+        .message code {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9em;
+        }
+
+        .message p {
+            margin-bottom: 8px;
+        }
+
+        .message ul, .message ol {
+            margin-left: 20px;
+            margin-bottom: 8px;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 12px;
+            background: #1e1e1e;
+            border-radius: 12px;
+            width: fit-content;
+            margin-top: 8px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #666;
+            border-radius: 50%;
+            animation: typing 1s infinite;
+        }
+
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+
         .input-area {
             display: flex;
             padding: 18px 24px;
@@ -133,6 +263,7 @@
             transition: background 0.2s;
             box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.04);
         }
+
         .input-area input:focus {
             background: #282828;
         }
@@ -151,16 +282,30 @@
             box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.06);
             transition: background 0.2s, color 0.2s, box-shadow 0.2s;
         }
-        .input-area button:hover {
+
+        .input-area button:hover:not(:disabled) {
             background: linear-gradient(90deg, #e0e0e0 60%, #fff 100%);
             color: #222;
             box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.10);
         }
+
         .input-area button:disabled {
             opacity: 0.4;
             cursor: default;
             background: #bbb;
             color: #fff;
+        }
+
+        .clear-chat {
+            background: transparent !important;
+            color: #888 !important;
+            border: 1px solid #333 !important;
+        }
+
+        .clear-chat:hover:not(:disabled) {
+            color: #fff !important;
+            border-color: #444 !important;
+            background: #232323 !important;
         }
 
         @media (max-width: 768px) {
@@ -171,6 +316,7 @@
             .input-area {
                 padding: 10px 4vw;
                 gap: 8px;
+                flex-wrap: wrap;
             }
             .message {
                 font-size: 0.98rem;
@@ -184,33 +330,307 @@
                 padding: 10px 4vw;
                 height: auto;
             }
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+                width: 100%;
+            }
+            .model-selector {
+                width: 100%;
+            }
             .sidebar {
                 gap: 10px;
             }
+            .clear-chat {
+                width: 100%;
+                margin-top: 8px;
+            }
+        }
+
+        .dropdown-container {
+            position: relative;
+            margin-left: auto;
+        }
+
+        .dropdown-button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: #232323;
+            border: 1px solid #333;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .dropdown-button:hover {
+            background: #2a2a2a;
+            border-color: #444;
+        }
+
+        .dropdown-button::after {
+            content: "▼";
+            font-size: 0.8em;
+            margin-left: 4px;
+            transition: transform 0.2s ease;
+        }
+
+        .dropdown-button.active::after {
+            transform: rotate(180deg);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 4px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 6px;
+            min-width: 200px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+            z-index: 1000;
+        }
+
+        .dropdown-menu.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            color: #fff;
+            text-decoration: none;
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+
+        .dropdown-item:first-child {
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom-left-radius: 6px;
+            border-bottom-right-radius: 6px;
+        }
+
+        .dropdown-item:hover {
+            background: #232323;
+        }
+
+        .dropdown-item.active {
+            background: #2a2a2a;
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .dropdown-item-icon {
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1em;
+        }
+
+        .dropdown-item-label {
+            flex: 1;
+        }
+
+        .dropdown-item-description {
+            font-size: 0.85em;
+            color: #888;
+            margin-top: 2px;
+        }
+
+        @media (max-width: 768px) {
+            .dropdown-container {
+                width: 100%;
+                margin: 8px 0;
+            }
+
+            .dropdown-button {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .dropdown-menu {
+                width: 100%;
+            }
+        }
+
+        .error-message {
+            padding: 10px;
+            margin-bottom: 15px;
+            background: #2a1515;
+            border: 1px solid #3d2020;
+            color: #ff6b6b;
+            border-radius: 6px;
+            font-size: 0.9rem;
         }
     </style>
 </head>
 <body>
-    <div class="chat-container">
-        <div class="header">
-            <nav class="sidebar">
-                <a href="{{ url_for('index') }}">Home</a>
-                <a href="{{ url_for('create') }}">Create</a>
-            </nav>
-            <span>Create Something</span>
+    <div class="main-container">
+        <div class="files-sidebar">
+            <h3>Your Files</h3>
+            {% if error %}
+            <div class="error-message">{{ error }}</div>
+            {% endif %}
+            <div class="files-list">
+                {% for file in user_files %}
+                <a href="/static/generated/{{ file }}" target="_blank" class="file-item">{{ file }}</a>
+                {% endfor %}
+                {% if not user_files %}
+                <div class="file-item" style="opacity: 0.6;">No files yet</div>
+                {% endif %}
+            </div>
         </div>
+        <div class="chat-container">
+            <div class="header">
+                <nav class="sidebar">
+                    <a href="{{ url_for('index') }}">Home</a>
+                    <a href="{{ url_for('create') }}">Create</a>
+                </nav>
+                <div class="dropdown-container">
+                    <button id="modelDropdown" class="dropdown-button">
+                        <span id="selectedModel">Select Model</span>
+                    </button>
+                    <div id="dropdownMenu" class="dropdown-menu">
+                        <!-- Services will be dynamically loaded here -->
+                    </div>
+                </div>
+            </div>
 
-        <div class="messages" id="messages"></div>
+            <div class="messages" id="messages"></div>
 
-        <div class="input-area">
-            <input type="text" id="messageInput" placeholder="Type your message…">
-            <button id="sendBtn" disabled>Send</button>
+            <div class="input-area">
+                <input type="text" id="messageInput" placeholder="Type your message…" disabled>
+                <button id="sendBtn" disabled>Send</button>
+                <button id="clearBtn" class="clear-chat" disabled>Clear Chat</button>
+            </div>
         </div>
     </div>
 
     <script>
+        // Get DOM elements
+        const messagesEl = document.getElementById('messages');
+        
         // --- Chat history logic ---
         let chatHistory = [];
+        let isTyping = false;
+
+        // Service configuration
+        const servicesConfig = JSON.parse('{{ config|tojson|safe }}');
+
+        // Load services configuration
+        function loadServicesConfig() {
+            try {
+                populateServiceDropdown();
+            } catch (error) {
+                console.error('Error loading services configuration:', error);
+                addMessage('Error: Failed to load services configuration', "bot");
+            }
+        }
+
+        // Populate service dropdown from configuration
+        function populateServiceDropdown() {
+            const dropdownMenu = document.getElementById('dropdownMenu');
+            dropdownMenu.innerHTML = ''; // Clear existing items
+
+            servicesConfig.services.forEach(service => {
+                const serviceElement = document.createElement('div');
+                serviceElement.className = 'dropdown-item';
+                serviceElement.dataset.model = service.id;
+                serviceElement.dataset.url = service.url[servicesConfig.environment];
+
+                serviceElement.innerHTML = `
+                    <div class="dropdown-item-icon">${service.icon}</div>
+                    <div>
+                        <div class="dropdown-item-label">${service.name}</div>
+                        <div class="dropdown-item-description">${service.description}</div>
+                    </div>
+                `;
+
+                dropdownMenu.appendChild(serviceElement);
+            });
+
+            // Reattach click handlers
+            attachDropdownHandlers();
+        }
+
+        // Attach click handlers to dropdown items
+        function attachDropdownHandlers() {
+            document.querySelectorAll('.dropdown-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const model = item.dataset.model;
+                    const url = item.dataset.url;
+                    
+                    // Update selected model
+                    selectedModel = model;
+                    selectedUrl = url;
+                    selectedModelText.textContent = item.querySelector('.dropdown-item-label').textContent;
+
+                    console.log("Selected model:", selectedModel);
+                    console.log("Selected URL:", selectedUrl);
+
+                    // Update active states
+                    document.querySelectorAll('.dropdown-item').forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+
+                    // Enable input and buttons
+                    messageInput.disabled = false;
+                    clearBtn.disabled = false;
+                    updateSendButtonState();
+
+                    // Close dropdown
+                    modelDropdown.classList.remove('active');
+                    dropdownMenu.classList.remove('active');
+
+                    // Clear chat and show welcome message
+                    chatHistory = [];
+                    saveChatHistory();
+                    renderChatHistory();
+                    addMessage(`Using ${selectedModelText.textContent}. How can I assist you today?`, "bot");
+
+                    if(selectedModel === "html_service"){   
+                        // set textbox to "Create something"
+                        messageInput.value = "Create me a simple todo list app. I want to be able to add, edit and delete tasks.";
+                    }
+                });
+            });
+        }
+
+        // Load services configuration on page load
+        document.addEventListener("DOMContentLoaded", () => {
+            loadServicesConfig(); // Now uses the server-provided config
+            chatHistory = [];
+            saveChatHistory();
+            renderChatHistory();
+            addMessage("Welcome! How can I assist you today?", "bot");
+        });
+
+        // Service URLs mapping
+        const serviceUrls = {
+            'service1': 'https://my-assistant.co.za/service1/query',
+            'base_chat':  'http://127.0.0.1:5002/query', //'https://my-assistant.co.za/base_chat/query',
+            'chatgpt_service': 'https://my-assistant.co.za/chatgpt_service/query',
+            'data_analyser': 'https://my-assistant.co.za/data_analyser/query',
+            'html_service': 'https://my-assistant.co.za/html_service/query'
+        };
 
         // Load chat history from localStorage
         function loadChatHistory() {
@@ -226,6 +646,30 @@
             localStorage.setItem("chatHistory", JSON.stringify(chatHistory));
         }
 
+        // Show typing indicator
+        function showTypingIndicator() {
+            if (isTyping) return;
+            isTyping = true;
+            const indicator = document.createElement("div");
+            indicator.id = "typingIndicator";
+            indicator.className = "typing-indicator";
+            indicator.innerHTML = `
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            `;
+            messagesEl.appendChild(indicator);
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+        }
+
+        // Hide typing indicator
+        function hideTypingIndicator() {
+            if (!isTyping) return;
+            isTyping = false;
+            const indicator = document.getElementById("typingIndicator");
+            if (indicator) indicator.remove();
+        }
+
         // Render all messages from chatHistory
         function renderChatHistory() {
             messagesEl.innerHTML = "";
@@ -238,44 +682,73 @@
         function addMessage(text, sender = "user", save = true) {
             const msg = document.createElement("div");
             msg.classList.add("message", sender);
-            msg.textContent = text;
+            
+            // Use marked.js to render markdown
+            msg.innerHTML = marked.parse(text);
+            
+            // Apply syntax highlighting to code blocks
+            msg.querySelectorAll('pre code').forEach((block) => {
+                hljs.highlightBlock(block);
+            });
+            
             messagesEl.appendChild(msg);
             messagesEl.scrollTop = messagesEl.scrollHeight;
+            
             if (save) {
                 chatHistory.push({ text, sender });
                 saveChatHistory();
             }
         }
 
-        // Initialize elements
-        const input = document.getElementById("messageInput");
-        const sendBtn = document.getElementById("sendBtn");
-        const messagesEl = document.getElementById("messages");
+        // --- Model selection logic ---
+        const modelDropdown = document.getElementById('modelDropdown');
+        const dropdownMenu = document.getElementById('dropdownMenu');
+        const selectedModelText = document.getElementById('selectedModel');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const clearBtn = document.getElementById('clearBtn');
+
+        let selectedModel = null;
+        let selectedUrl = null;
+
+        // Toggle dropdown
+        modelDropdown.addEventListener('click', () => {
+            modelDropdown.classList.toggle('active');
+            dropdownMenu.classList.toggle('active');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!modelDropdown.contains(e.target)) {
+                modelDropdown.classList.remove('active');
+                dropdownMenu.classList.remove('active');
+            }
+        });
+
+        // Update send button state
+        function updateSendButtonState() {
+            sendBtn.disabled = !messageInput.value.trim() || !selectedModel;
+        }
 
         // Enable/disable send button based on input
-        input.addEventListener("input", () => {
-            sendBtn.disabled = !input.value.trim();
-        });
+        messageInput.addEventListener("input", updateSendButtonState);
 
         // Handle send button click
         sendBtn.addEventListener("click", async () => {
-            const text = input.value.trim();
-            if (!text) return;
+            const text = messageInput.value.trim();
+            if (!text || !selectedUrl) return;
             
             addMessage(text, "user");
-            input.value = "";
-            sendBtn.disabled = true;
+            messageInput.value = "";
+            updateSendButtonState();
+            showTypingIndicator();
 
             try {
-                // var url = 'http://127.0.0.1:5001/query';
-                // var url = 'http://service1/query';
-                var url = 'https://my-assistant.co.za/service1/query';
-                console.log("Sending query to service1");
-                console.log(text);
-                console.log("URL: ");
-                console.log(url);
-                // var url = "service1/query";
-                const response = await fetch(url, {
+                console.log(`Sending query to ${selectedModel}`);
+                console.log("Query:", text);
+                console.log("URL:", selectedUrl);
+                
+                const response = await fetch(selectedUrl, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -283,24 +756,61 @@
                     body: JSON.stringify({ query: text })
                 });
                 
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
                 const data = await response.json();
-                addMessage(data.response || JSON.stringify(data), "bot");
+                hideTypingIndicator();
+
+                console.log("Response:", data);
+                if(selectedModel === "html_service"){
+                    // get html from data.response
+                    const html = data.response;
+                    // create a div with the html
+                    const htmlDiv = document.createElement("div");
+                    htmlDiv.innerHTML = html;
+                    messagesEl.appendChild(htmlDiv);
+                    messagesEl.scrollTop = messagesEl.scrollHeight;
+                    // post the html to to root of the app
+                    const saveResponse = await fetch('/save_html', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ html: html })
+                    });
+                    
+                    const saveData = await saveResponse.json();
+                    if (saveData.url) {
+                        addMessage(`HTML generated successfully! <a href="${saveData.url}" target="_blank">View Generated App</a>`, "bot");
+                    } else {
+                        addMessage("HTML generated but couldn't be saved. Check the console for details.", "bot");
+                    }
+                }else{
+                    addMessage(data.response || JSON.stringify(data), "bot");
+                }
+
             } catch (error) {
+                hideTypingIndicator();
                 addMessage('Error: ' + error.message, "bot");
             }
         });
 
         // Handle Enter key press
-        input.addEventListener("keydown", (e) => {
-            if (e.key === "Enter" && !sendBtn.disabled) sendBtn.click();
+        messageInput.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" && !e.shiftKey && !sendBtn.disabled) {
+                e.preventDefault();
+                sendBtn.click();
+            }
         });
 
-        // On page load
-        document.addEventListener("DOMContentLoaded", () => {
+        // Handle clear chat button
+        clearBtn.addEventListener("click", () => {
             chatHistory = [];
             saveChatHistory();
             renderChatHistory();
-            addMessage("Welcome! How can I assist you today?", "bot");
+            addMessage("Chat cleared. How can I assist you today?", "bot");
         });
     </script>
 </body>

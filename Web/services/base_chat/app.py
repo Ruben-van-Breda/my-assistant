@@ -80,28 +80,28 @@ def process_data():
     return jsonify({"processed_data": processed_data})
 
 # Example API endpoint for querying
-@app.route('/query', methods=['GET'])
-def query_data():
-    query = request.args.get('q', '')
-    if not query:
-        return jsonify({"error": "No query provided"}), 400
+# @app.route('/query', methods=['GET'])
+# def query_data():
+#     query = request.args.get('q', '')
+#     if not query:
+#         return jsonify({"error": "No query provided"}), 400
 
-    # Example query logic
-    chat_response = Query(query)
-    # Here you would typically call the OpenAI API or another service to process the query
+#     # Example query logic
+#     chat_response = Query(query)
+#     # Here you would typically call the OpenAI API or another service to process the query
 
-    return jsonify({"query": query, "response": chat_response})
+#     return jsonify({"query": query, "response": chat_response})
 
-@app.route('/chat', methods=['POST'])
+@app.route('/query', methods=['POST'])
 def chat():
     data = request.get_json()
-    if not data or 'message' not in data:
+    if not data or 'query' not in data:
         return jsonify({"error": "No message provided"}), 400
 
-    user_message = data['message']
+    user_message = data['query']
     chat_response = Query(user_message)
-    return jsonify({"reply": chat_response})
+    return jsonify({"response": chat_response})
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5002, host='0.0.0.0')
+    app.run(debug=True, port=5001, host='0.0.0.0')

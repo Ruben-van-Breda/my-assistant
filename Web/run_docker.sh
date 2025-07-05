@@ -8,7 +8,7 @@
 echo "Exposing port $PORT for service $SERVICE"
 
 docker-compose down 
-
+# docker-compose down --remove-orphans
 
 docker-compose build
 # Run only the specified service and map the port

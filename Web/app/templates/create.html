@@ -8,5 +8,12 @@
     <h1>Create Something</h1>
     <p>This page will interact with the independent service.</p>
     <a href="{{ url_for('index') }}">Back to Home</a>
+
+    <form action="/service1/create" method="post">
+        <input type="text" name="name" placeholder="Enter your name">
+        <button type="submit">Create</button>
+    </form>
+
+    <p>Response from service1: {{ response }}</p>
 </body>
 </html>

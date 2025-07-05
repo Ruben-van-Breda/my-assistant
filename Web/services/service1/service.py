@@ -15,5 +15,10 @@ def query():
     q = request.args.get('q', '')
     return jsonify(result=f"You queried: {q}")
 
+@app.route('/create', methods=['POST'])
+def create():
+    data = request.json
+    return jsonify(result=f"Created: {data}")
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001)
+    app.run(host='0.0.0.0', port=5000)

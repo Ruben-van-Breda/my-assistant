@@ -6,7 +6,7 @@
             "description": "Basic chat functionality",
             "icon": "💬",
             "url": {
-                "development": "http://127.0.0.1:5001/query",
+                "development": "http://127.0.0.1:3000/query",
                 "production": "https://my-assistant.co.za/base_chat/query"
             }
         },
@@ -17,7 +17,7 @@
             "description": "HTML generation and processing",
             "icon": "🌐",
             "url": {
-                "development": "http://127.0.0.1:5003/query",
+                "development": "http://127.0.0.1:3001/query",
                 "production": "https://my-assistant.co.za/html_service/query"
             }
         }

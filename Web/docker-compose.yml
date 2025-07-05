@@ -10,10 +10,10 @@ services:
     networks:
       - app_network
 
-  service1:
-    build: ./services/service1
+  base_chat:
+    build: ./services/base_chat
     ports:
-      - "5001:5000"
+      - "5001:5001"
     networks:
       - app_network
   
@@ -36,7 +36,7 @@ services:
       - /etc/nginx/ssl-dhparams.pem:/etc/nginx/ssl-dhparams.pem:ro
     depends_on:
       - app
-      - service1
+      - base_chat
       - html_service
     networks:
       - app_network

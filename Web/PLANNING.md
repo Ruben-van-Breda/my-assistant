@@ -1,8 +1,9 @@
-Make ./app/templates/create.html better.
+Make a class Auth to handle simple authentication.
 
-Improve the logic for services and urls.
-Make a dropdown menu top right to list the services availbale.
+Add login: 
+- email
+- password
 
---
+For Validation check if password is 'ewout'. If so add session[userId']: = email.
 
-Now when I send check the model selelected and use its url for the fetch
+If not valid reroute to login

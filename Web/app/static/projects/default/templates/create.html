@@ -331,7 +331,7 @@
                 }
 
                 try {
-                    const filePath = `/static/projects/{{ user_id }}/${filename}`;
+                    const filePath = `/static/projects/{{ session['user_id'] }}/${filename}`;
                     const response = await fetch(filePath);
                     const content = await response.text();
 
@@ -420,13 +420,15 @@
             async function editFile(filename) {
                 console.log(`Editing file: ${filename}`);
                 // Get file content
-                const filePath = `/static/projects/{{ user_id }}/${filename}`;
+                const filePath = `/static/projects/{{ session['user_id'] }}/${filename}`;
                 const response = await fetch(filePath);
                 const content = await response.text();
                 console.log(`File content: ${content}`);
                 addMessage(`Editing file: ${filename}`, "user");
                 chatHistory.push({ text: `Im editing the file: ${filename}: ${content}`, sender: "user" });
                 saveChatHistory();
+                // reload generated files
+                // renderChatHistory();
             }
 
             // Initialize file deletion

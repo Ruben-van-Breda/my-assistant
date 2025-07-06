@@ -1,9 +1,10 @@
-from flask import Flask, render_template, request, jsonify, send_from_directory, session
+from flask import Flask, render_template, request, jsonify, send_from_directory, session, redirect, url_for
 import requests
 import os
 import json
 import shutil
 from werkzeug.utils import secure_filename
+from components.auth import Auth, login_required
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -22,7 +23,7 @@ APP_ROOT = os.path.dirname(__file__)
 
 def get_user_project_dir():
     """Get or create user's project directory."""
-    user_id = session.get('user_id', 'default')
+    user_id = session.get('userId', 'default')
     user_project_dir = os.path.join(PROJECTS_DIR, user_id)
     
     # Create user project directory if it doesn't exist
@@ -122,9 +123,8 @@ def load_services_config():
         return {"services": [], "environment": "development"}
 
 @app.route('/')
+@login_required
 def index():
-    # Auth
-    authenticate()
     # request services config
     config = load_services_config()
     # Initialize user's project directory
@@ -134,24 +134,11 @@ def index():
     project_files = get_project_files()
     return render_template('index.html', config=config, user_files=user_files, project_files=project_files)
 
-def authenticate():
-    # set session cookie
-    if 'user_id' not in session:
-        session['user_id'] = '123'
-        # Initialize user's project directory on first login
-        get_user_project_dir()
-    print("Session cookie set")
-    print(session)
-    return True
-
 @app.route('/create')
+@login_required
 def create():
     print("Creating new project")
     try:
-        # Ensure user is authenticated
-        if not authenticate():
-            return render_template('create.html', config={}, user_files=[], project_files=[], error="Authentication failed")
-
         # Request services config
         try:
             config = load_services_config()
@@ -162,8 +149,13 @@ def create():
         # Load user files - already handles errors internally
         user_files = load_user_files()
         project_files = get_project_files()
+        user_id = session.get('userId', 'default')
 
-        return render_template('create.html', config=config, user_files=user_files, project_files=project_files)
+        return render_template('create.html', 
+                             config=config, 
+                             user_files=user_files, 
+                             project_files=project_files,
+                             user_id=user_id)
     except Exception as e:
         print(f"Error in create route: {e}")
         return render_template('create.html', config={}, user_files=[], project_files=[], error=str(e))
@@ -236,9 +228,9 @@ def get_services_config():
 def load_user_files():
     try:
         print("Loading user files")
-        user_id = session.get("user_id")
+        user_id = session.get("userId")
         if not user_id:
-            print("No user_id in session")
+            print("No userId in session")
             return []
 
         # Get user's directory in static/projects
@@ -275,9 +267,9 @@ def save_html():
             return jsonify({'error': 'No HTML content provided'}), 400
             
         # Get user's project directory
-        user_id = session.get('user_id', 'default')
+        user_id = session.get('userId', 'default')
         
-        # Save directly to static/projects/{userid}/
+        # Save to user's project directory under static/projects/{userid}/
         user_dir = os.path.join(PROJECTS_DIR, user_id)
         
         # Ensure user directory exists
@@ -296,9 +288,12 @@ def save_html():
                 f.write(html_content)
             
         # Return the URL where the file can be accessed
+        # URL is relative to /static since that's how Flask serves static files
+        relative_url = f'projects/{user_id}/{safe_filename}'
+        
         return jsonify({
             'message': 'HTML saved successfully' if should_save else 'HTML generated successfully',
-            'url': f'/static/projects/{user_id}/{safe_filename}',
+            'url': f'/static/{relative_url}',
             'saved': should_save,
             'filename': safe_filename
         })
@@ -315,7 +310,7 @@ def delete_file():
             return jsonify({'error': 'No filename provided'}), 400
             
         # Get user's directory
-        user_id = session.get('user_id', 'default')
+        user_id = session.get('userId', 'default')
         user_dir = os.path.join(PROJECTS_DIR, user_id)
         
         # Construct full file path
@@ -338,6 +333,23 @@ def delete_file():
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        
+        if Auth.login(email, password):
+            return redirect(url_for('index'))
+        return render_template('login.html', error='Invalid credentials')
+    
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    Auth.logout()
+    return redirect(url_for('login'))
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)

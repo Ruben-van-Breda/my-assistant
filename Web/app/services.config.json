@@ -2,9 +2,9 @@
     "services": [
         {
             "id": "base_chat",
-            "name": "Base Chat",
-            "description": "Basic chat functionality",
-            "icon": "💬",
+            "name": "Agent Chat",
+            "description": "For general purpose chat",
+            "icon": "🤖",
             "url": {
                 "development": "http://127.0.0.1:3000/query",
                 "production": "https://my-assistant.co.za/base_chat/query"

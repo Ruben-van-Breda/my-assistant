@@ -604,9 +604,8 @@
             chatHistory = [];
             saveChatHistory();
             renderChatHistory();
-            if (messagesEl) {
-                addMessage("Welcome! Please select a model to begin.", "bot");
-            }
+            selectService(servicesConfig.services[0].id, servicesConfig.services[0].url[servicesConfig.environment], servicesConfig.services[0].name);
+           
 
             // Service URLs mapping
             const serviceUrls = {

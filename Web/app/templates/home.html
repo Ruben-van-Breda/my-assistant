@@ -3,268 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project Files</title>
-    <style>
-        /* Navigation styles */
-        .header {
-            background: #2c3e50;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 1rem 0;
+    <!-- <title>Project Files</title> -->
+    <!-- Add Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            100: '#121212',
+                            200: '#1E1E1E',
+                            300: '#2D2D2D',
+                            400: '#363636',
+                            500: '#404040',
+                        },
+                        accent: {
+                            primary: '#3B82F6',
+                            secondary: '#1D4ED8',
+                            success: '#059669',
+                            danger: '#DC2626'
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04)',
+                    }
+                }
+            }
         }
-        .header-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .nav-menu {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-        .nav-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            color: #e2e8f0;
-            font-size: 0.875rem;
-            font-weight: 500;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 0.5rem;
-            transition: all 0.2s ease;
-        }
-        .nav-link:hover {
-            background: rgba(255, 255, 255, 0.2);
-            color: #ffffff;
-        }
-        .model-selector {
-            position: relative;
-        }
-        .model-button {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.5rem 1rem;
-            min-width: 200px;
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: #e2e8f0;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 0.5rem;
-            transition: all 0.2s ease;
-        }
-        .model-button:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-        .model-button:focus {
-            outline: none;
-            ring: 2px solid #60a5fa;
-            border-color: transparent;
-        }
-        .dropdown-menu {
-            position: absolute;
-            right: 0;
-            top: calc(100% + 0.5rem);
-            width: 100%;
-            background: #2c3e50;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            z-index: 50;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-10px);
-            transition: all 0.2s ease;
-        }
-        .dropdown-menu.show {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-        /* Existing styles */
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 20px;
-            padding: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        .file-card {
-            background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
-            cursor: pointer;
-        }
-        .file-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-        }
-        .file-icon {
-            font-size: 24px;
-            margin-bottom: 10px;
-        }
-        .file-name {
-            font-weight: bold;
-            margin-bottom: 5px;
-            word-break: break-word;
-        }
-        .file-path {
-            font-size: 0.8em;
-            color: #666;
-            word-break: break-word;
-        }
-        .file-type {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 0.8em;
-            margin-top: 5px;
-        }
-        .type-html { background: #ffebee; color: #c62828; }
-        .type-code { background: #e3f2fd; color: #1565c0; }
-        .type-style { background: #f3e5f5; color: #6a1b9a; }
-        .type-data { background: #e8f5e9; color: #2e7d32; }
-        .type-file { background: #eeeeee; color: #424242; }
-
-        /* Modal styles */
-        .modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.9);
-            z-index: 50;
-            display: none;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        .modal.show {
-            opacity: 1;
-        }
-        .modal-content {
-            position: fixed;
-            inset: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .modal-container {
-            background: #1E1E1E;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            opacity: 0;
-            transform: translateY(1rem);
-            transition: all 0.3s ease;
-        }
-        .modal.show .modal-container {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        .modal-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 1rem;
-            border-bottom: 1px solid #2D2D2D;
-        }
-        .modal-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: white;
-        }
-        .modal-close {
-            padding: 0.5rem;
-            border-radius: 0.5rem;
-            transition: background-color 0.2s;
-            color: #9CA3AF;
-        }
-        .modal-close:hover {
-            background-color: #2D2D2D;
-            color: white;
-        }
-        .modal-body {
-            flex: 1;
-            overflow: hidden;
-            max-height: 90vh;
-        }
-        .modal-preview {
-            height: 100%;
-        }
-        .modal-preview iframe {
-            width: 100%;
-            height: 100%;
-            border: 0;
-        }
-    </style>
+    </script>
 </head>
-<body>
+<body class="bg-dark-100 text-gray-200 min-h-screen">
     <!-- File Content Modal -->
-    <div id="fileContentModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-container">
-                <div class="modal-header">
-                    <h3 id="fileContentTitle" class="modal-title"></h3>
-                    <button id="closeFileContentModal" class="modal-close">
+    <div id="fileContentModal" class="fixed inset-0 bg-black/90 z-50 hidden opacity-0 transition-opacity duration-300">
+        <div class="fixed inset-0 flex items-center justify-center">
+            <div class="bg-dark-200 w-full h-full flex flex-col opacity-0 translate-y-4 transition-all duration-300" id="modalContent">
+                <div class="flex items-center justify-between p-4 border-b border-dark-300">
+                    <h3 id="fileContentTitle" class="text-xl font-semibold text-white"></h3>
+                    <button id="closeFileContentModal" class="p-2 hover:bg-dark-300 rounded-lg transition-colors text-gray-400 hover:text-white">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
                 </div>
-                <div class="modal-body">
-                    <div id="fileContentPreview" class="modal-preview"></div>
+                <div class="flex-1 overflow-hidden">
+                    <div id="fileContentPreview" class="h-full"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <header class="header">
-        <div class="header-container">
-           
-
-            <!-- Navigation -->
-            <nav class="nav-menu">
-                <a href="{{ url_for('index') }}" class="nav-link">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                    </svg>
-                    Home
-                </a>
-                <a href="{{ url_for('create') }}" class="nav-link">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                    </svg>
-                    Create Application
-                </a>
-            </nav>
-
-          
+    <!-- Header -->
+    <header class="bg-dark-200 border-b border-dark-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- <div class="flex items-center">
+                    <h1 class="text-xl font-semibold text-white">Project Files</h1>
+                </div> -->
+                <nav class="flex items-center space-x-4">
+                    <a href="{{ url_for('index') }}" class="flex items-center px-4 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-dark-300 transition-colors">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                        </svg>
+                        Home
+                    </a>
+                    <a href="{{ url_for('create') }}" class="flex items-center px-4 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-dark-300 transition-colors">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Create
+                    </a>
+                    <a href="{{ url_for('logout') }}" class="flex items-center px-4 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-dark-300 transition-colors">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                        Logout
+                    </a>
+                </nav>
+            </div>
         </div>
     </header>
-    <div class="grid-container">
-        {% for file in project_files %}
-        <div class="file-card" onclick="viewFileContent('{{ file.name }}')">
-            <div class="file-icon">
-                {% if file.type == 'html' %}📄
-                {% elif file.type == 'code' %}💻
-                {% elif file.type == 'style' %}🎨
-                {% elif file.type == 'data' %}📊
-                {% else %}📁
-                {% endif %}
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {% for file in project_files %}
+            <div class="group bg-dark-200 rounded-xl p-4 hover:bg-dark-300 transition-all cursor-pointer shadow-soft" onclick="viewFileContent('{{ file.name }}')">
+                <div class="flex items-center gap-3">
+                    <div class="text-2xl">
+                        {% if file.type == 'html' %}
+                   
+                        <!-- <svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg> -->
+                        🚀
+                        {% elif file.type == 'code' %}
+                        <svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                        </svg>
+                        {% elif file.type == 'style' %}
+                        <svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                        </svg>
+                        {% elif file.type == 'data' %}
+                        <svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+                        </svg>
+                        {% else %}
+                        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        {% endif %}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="text-lg font-medium text-white">{{ file.name.replace('.html', '') }}</h3>
+                    </div>
+                </div>
             </div>
-            <div class="file-name">{{ file.name }}</div>
-            <div class="file-path">{{ file.directory if file.directory else 'Root' }}</div>
-            <div class="file-type type-{{ file.type }}">{{ file.type }}</div>
+            {% endfor %}
         </div>
-        {% endfor %}
-    </div>
+    </main>
 
     <script>
         // Modal elements
@@ -272,18 +131,21 @@
         const fileContentTitle = document.getElementById('fileContentTitle');
         const fileContentPreview = document.getElementById('fileContentPreview');
         const closeFileContentModal = document.getElementById('closeFileContentModal');
+        const modalContent = document.getElementById('modalContent');
 
         // Function to show modal with animation
         function showModal() {
             fileContentModal.style.display = 'block';
             // Trigger reflow
             fileContentModal.offsetHeight;
-            fileContentModal.classList.add('show');
+            fileContentModal.classList.remove('opacity-0');
+            modalContent.classList.remove('opacity-0', 'translate-y-4');
         }
 
         // Function to hide modal with animation
         function hideModal() {
-            fileContentModal.classList.remove('show');
+            fileContentModal.classList.add('opacity-0');
+            modalContent.classList.add('opacity-0', 'translate-y-4');
             setTimeout(() => {
                 fileContentModal.style.display = 'none';
                 fileContentPreview.innerHTML = ''; // Clear content
@@ -336,7 +198,7 @@
 
         // Close modal on escape key
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && fileContentModal.classList.contains('show')) {
+            if (e.key === 'Escape' && !fileContentModal.classList.contains('opacity-0')) {
                 hideModal();
             }
         });

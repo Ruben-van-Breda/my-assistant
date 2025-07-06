@@ -124,6 +124,9 @@ def load_services_config():
 
 @app.route('/')
 def index():
+    if session.get('userId'):
+        pass
+        # return redirect(url_for('home'))
     # request services config
     config = load_services_config()
     # Initialize user's project directory

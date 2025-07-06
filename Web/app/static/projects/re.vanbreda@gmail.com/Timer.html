@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            background-color: #0f0f0f;
+            font-family: "Segoe UI", "Roboto", Arial, sans-serif;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        #app {
+            background: #232323;
+            border-radius: 15px;
+            padding: 20px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+        }
+        #countdown {
+            font-size: 2em;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        #time-input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            box-shadow: inset 0px 0px 5px rgba(0, 0, 0, 0.5);
+            color: #fff;
+            background: #0f0f0f;
+        }
+        #start-btn {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            color: #fff;
+            background: linear-gradient(45deg, #0f0f0f, #232323);
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        #start-btn:hover {
+            background: linear-gradient(45deg, #232323, #0f0f0f);
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div id="countdown">00:00</div>
+        <input type="number" id="time-input" min="0" placeholder="Enter time in seconds">
+        <button id="start-btn">Start Countdown</button>
+    </div>
+    <script>
+        const countdownEl = document.getElementById('countdown');
+        const timeInput = document.getElementById('time-input');
+        const startBtn = document.getElementById('start-btn');
+        let countdownInterval;
+
+        startBtn.addEventListener('click', () => {
+            clearInterval(countdownInterval);
+            let timeLeft = parseInt(timeInput.value);
+            countdownInterval = setInterval(() => {
+                if(timeLeft <= 0) {
+                    clearInterval(countdownInterval);
+                    countdownEl.textContent = '00:00';
+                    return;
+                }
+                timeLeft--;
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                countdownEl.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Agent Chat</title>
     <!-- Add Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -38,8 +38,28 @@
             }
         }
     </script>
+    <style>
+        /* Custom CSS for iOS safe areas */
+        @supports(padding: max(0px)) {
+            .safe-bottom {
+                padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+            }
+        }
+        
+        /* Use dvh for dynamic viewport height */
+        .h-screen-dynamic {
+            height: 100dvh;
+        }
+        
+        /* Fallback for browsers that don't support dvh */
+        @supports not (height: 100dvh) {
+            .h-screen-dynamic {
+                height: 100vh;
+            }
+        }
+    </style>
 </head>
-<body class="bg-dark-100 text-white h-screen flex flex-col overflow-hidden">
+<body class="bg-dark-100 text-white h-screen-dynamic flex flex-col overflow-hidden">
     <!-- Add Modal for Preview and Save -->
     <div id="previewModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
         <div class="bg-dark-200 rounded-lg w-full max-w-4xl mx-4 max-h-[90vh] flex flex-col">
@@ -94,15 +114,15 @@
     </div>
 
     <!-- Main Layout -->
-    <div class="flex h-screen overflow-hidden">
-        <!-- Mobile Sidebar Overlay -->
-        <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden"></div>
+    <div class="flex h-screen-dynamic overflow-hidden">
+        <!-- Sidebar Overlay -->
+        <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-40 hidden"></div>
         
         <!-- Unified Sidebar -->
-        <aside id="projectSidebar" class="fixed md:static inset-y-0 left-0 w-80 bg-dark-200 border-r border-dark-300 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out z-50">
-            <div class="flex justify-between items-center p-4 border-b border-dark-300 md:p-6">
+        <aside id="projectSidebar" class="fixed inset-y-0 left-0 w-80 bg-dark-200 border-r border-dark-300 transform -translate-x-full transition-transform duration-300 ease-in-out z-50">
+            <div class="flex justify-between items-center p-4 border-b border-dark-300">
                 <h3 class="text-xl font-semibold">Apps</h3>
-                <button id="closeSidebar" class="p-2 hover:bg-dark-300 rounded-lg transition-colors md:hidden">
+                <button id="closeSidebar" class="p-2 hover:bg-dark-300 rounded-lg transition-colors">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -158,8 +178,8 @@
             <header class="bg-dark-200 border-b border-dark-300 flex-shrink-0">
                 <div class="max-w-7xl mx-auto">
                     <div class="flex items-center justify-between p-4">
-                        <!-- Mobile menu button -->
-                        <button id="hamburgerBtn" class="md:hidden p-2 rounded-lg hover:bg-dark-300 transition-colors">
+                        <!-- Burger menu button - visible on all screen sizes -->
+                        <button id="hamburgerBtn" class="p-2 rounded-lg hover:bg-dark-300 transition-colors">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                             </svg>
@@ -210,7 +230,7 @@
             </div>
 
             <!-- Input Area -->
-            <div class="bg-dark-200 border-t border-dark-300 p-6 flex-shrink-0">
+            <div class="bg-dark-200 border-t border-dark-300 p-6 flex-shrink-0 safe-bottom">
                 <div class="max-w-3xl mx-auto space-y-4">
                     <div class="flex gap-3">
                         <input type="text" id="messageInput" 
@@ -220,12 +240,8 @@
                                 class="px-6 py-3 bg-accent-primary hover:bg-accent-secondary disabled:bg-dark-400 disabled:text-gray-500 rounded-xl font-medium transition-colors flex items-center gap-2"
                                 disabled>
                             <span>🚀</span>
-                            <!-- <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                            </svg> -->
                         </button>
                     </div>
-                   
                 </div>
             </div>
         </main>
@@ -241,6 +257,7 @@
         let isTyping = false;
         let selectedModel = null;
         let selectedUrl = null;
+        let isSidebarOpen = false;
 
         // DOM Elements - declare outside DOMContentLoaded to avoid redeclaration
         let messagesEl;
@@ -255,6 +272,10 @@
         let messageInput;
         let sendBtn;
         let clearBtn;
+        let hamburgerBtn;
+        let projectSidebar;
+        let closeSidebar;
+        let sidebarOverlay;
 
         // Initialize everything when DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {
@@ -271,6 +292,57 @@
             messageInput = document.getElementById('messageInput');
             sendBtn = document.getElementById('sendBtn');
             clearBtn = document.getElementById('clearBtn');
+            hamburgerBtn = document.getElementById('hamburgerBtn');
+            projectSidebar = document.getElementById('projectSidebar');
+            closeSidebar = document.getElementById('closeSidebar');
+            sidebarOverlay = document.getElementById('sidebarOverlay');
+
+            // Toggle sidebar function
+            function toggleSidebar() {
+                isSidebarOpen = !isSidebarOpen;
+                projectSidebar.classList.toggle('-translate-x-full');
+                sidebarOverlay.classList.toggle('hidden');
+                
+                // Update hamburger button appearance
+                if (isSidebarOpen) {
+                    hamburgerBtn.classList.add('bg-dark-300');
+                } else {
+                    hamburgerBtn.classList.remove('bg-dark-300');
+                }
+            }
+
+            // Initialize sidebar event listeners
+            hamburgerBtn.addEventListener('click', toggleSidebar);
+            closeSidebar.addEventListener('click', toggleSidebar);
+            sidebarOverlay.addEventListener('click', toggleSidebar);
+
+            // Add keyboard shortcut for toggling sidebar
+            document.addEventListener('keydown', (e) => {
+                // Check for Cmd/Ctrl + B
+                if ((e.metaKey || e.ctrlKey) && e.key === 'b') {
+                    e.preventDefault(); // Prevent default browser behavior
+                    toggleSidebar();
+                }
+            });
+
+            // Close sidebar when clicking file content button
+            document.querySelectorAll('.file-content-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    if (isSidebarOpen) {
+                        toggleSidebar();
+                        hamburgerBtn.click();
+                    }
+                });
+            });
+
+            // Close sidebar when clicking edit file button
+            document.querySelectorAll('.edit-file-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    if (isSidebarOpen) {
+                        toggleSidebar();
+                    }
+                });
+            });
 
             // Toggle dropdown
             if (modelDropdown && dropdownMenu) {
@@ -814,22 +886,6 @@
                 renderChatHistory();
                 addMessage("Chat cleared. How can I assist you today?", "bot");
             });
-
-            // Add this at the beginning of your script section
-            const hamburgerBtn = document.getElementById('hamburgerBtn');
-            const projectSidebar = document.getElementById('projectSidebar');
-            const closeSidebar = document.getElementById('closeSidebar');
-            const sidebarOverlay = document.getElementById('sidebarOverlay');
-
-            // Toggle sidebar
-            function toggleSidebar() {
-                projectSidebar.classList.toggle('-translate-x-full');
-                sidebarOverlay.classList.toggle('hidden');
-            }
-
-            hamburgerBtn.addEventListener('click', toggleSidebar);
-            closeSidebar.addEventListener('click', toggleSidebar);
-            sidebarOverlay.addEventListener('click', toggleSidebar);
         });
     </script>
 </body>

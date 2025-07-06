@@ -98,11 +98,11 @@
         <!-- Mobile Sidebar Overlay -->
         <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden"></div>
         
-        <!-- Mobile Sidebar -->
-        <aside id="projectSidebar" class="fixed inset-y-0 left-0 w-80 bg-dark-200 border-r border-dark-300 transform -translate-x-full transition-transform duration-300 ease-in-out md:hidden z-50">
-            <div class="flex justify-between items-center p-4 border-b border-dark-300">
+        <!-- Unified Sidebar -->
+        <aside id="projectSidebar" class="fixed md:static inset-y-0 left-0 w-80 bg-dark-200 border-r border-dark-300 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out z-50">
+            <div class="flex justify-between items-center p-4 border-b border-dark-300 md:p-6">
                 <h3 class="text-xl font-semibold">Apps</h3>
-                <button id="closeSidebar" class="p-2 hover:bg-dark-300 rounded-lg transition-colors">
+                <button id="closeSidebar" class="p-2 hover:bg-dark-300 rounded-lg transition-colors md:hidden">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -129,74 +129,20 @@
                                 </svg>
                             </button>
                             <button class="delete-file p-2 hover:bg-accent-danger/20 rounded-lg transition-all"
-                                data-filename="{{ file }}">
-                            <svg class="w-4 h-4 text-accent-danger" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                        </button>
-                        </div>
-                        
-                    </div>
-                    {% endfor %}
-                    {% if not user_files %}
-                    <div class="p-4 bg-dark-300 rounded-xl text-gray-400 text-sm">No files yet</div>
-                    {% endif %}
-                </div>
-            </div>
-            <button id="clearBtn" 
-                class="inline-flex items-center gap-1.5 px-5 mx-5 py-1.5 text-xs font-medium text-gray-300 hover:text-white bg-dark-300 rounded-lg transition-colors hover:bg-dark-400 md:gap-2 md:px-4 md:py-2 md:text-sm bottom-0 absolute my-5"
-                >
-                    <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                    <span class="hidden sm:inline">Clear Chat</span>
-                    <span class="sm:hidden">Clear</span>
-                </button>
-        </aside>
-
-        <!-- Generated Files Sidebar (Desktop) -->
-        <aside class="w-80 bg-dark-200 border-r border-dark-300 hidden md:flex flex-col">
-            <div class="p-6">
-                <h3 class="text-xl font-semibold mb-6">Apps</h3>
-                <div class="space-y-3">
-                    {% for file in user_files %}
-                    <div class="group relative bg-dark-300 rounded-xl transition-all hover:bg-dark-400">
-                        <button class="file-content-btn w-full text-left block p-4 text-gray-200" 
-                                data-file="{{ file }}">
-                            <div class="flex items-center gap-3">
-                                <!-- <svg class="w-5 h-5 text-accent-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg> -->
-                                <span class="text-sm font-medium">{{ file.replace('.html', '') }}</span>
-                            </div>
-                        </button>
-                        <div class="flex absolute right-3 top-1/2 -translate-y-1/2">
-                            <!-- Edit file -->
-                            <button class="edit-file-btn p-2 hover:bg-accent-primary/20 rounded-lg transition-all"
-                                    data-filename="{{ file }}">
-                                <svg class="w-4 h-4 text-accent-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                </svg>
-                            </button>
-                            <!-- Delete file -->
-                            <button class="delete-file p-2 hover:bg-accent-danger/20 rounded-lg transition-all"
                                     data-filename="{{ file }}">
                                 <svg class="w-4 h-4 text-accent-danger" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                 </svg>
                             </button>
-                            
                         </div>
                     </div>
                     {% endfor %}
                     {% if not user_files %}
                     <div class="p-4 bg-dark-300 rounded-xl text-gray-400 text-sm">No files yet</div>
                     {% endif %}
-                  
                 </div>
                 <button id="clearBtn" 
-                class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-300 hover:text-white bg-dark-300 rounded-lg transition-colors hover:bg-dark-400 md:gap-2 md:px-4 md:py-2 md:text-sm bottom-0 absolute my-5"
-                >
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-300 hover:text-white bg-dark-300 rounded-lg transition-colors hover:bg-dark-400 md:gap-2 md:px-4 md:py-2 md:text-sm bottom-0 absolute my-5">
                     <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>

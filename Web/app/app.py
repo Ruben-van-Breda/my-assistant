@@ -123,7 +123,6 @@ def load_services_config():
         return {"services": [], "environment": "development"}
 
 @app.route('/')
-@login_required
 def index():
     # request services config
     config = load_services_config()
@@ -159,6 +158,12 @@ def create():
     except Exception as e:
         print(f"Error in create route: {e}")
         return render_template('create.html', config={}, user_files=[], project_files=[], error=str(e))
+
+@app.route('/home')
+@login_required
+def home():
+    project_files = get_project_files()
+    return render_template('home.html', project_files=project_files)
 
 @app.route('/get_file_content', methods=['GET'])
 def get_file_content():

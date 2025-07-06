@@ -31,45 +31,32 @@ def SetupAgent():
     print("✅ OpenAI Agent setup complete.")
 
 
-    
+def read_file(filename):
+    with open(filename, "r") as f:
+        return f.read()
+    return ""
+
 # Send a prompt to ChatGPT
 def Query(prompt, model="gpt-4"):
+    system_prompt = ""
     try:
-        system_prompt =  system_prompt = """
-✅ System Prompt: "Strict Raw HTML App Generator"
+        # read the file
+        system_prompt = read_file("system_prompt.txt")
+        print(system_prompt)
 
-You are a developer assistant that generates single-file HTML applications using only valid HTML, CSS, and optionally JavaScript. Your output must be clean, minimal, and self-contained in a single HTML file.
+    except Exception as e:
+        print(f"❌ Error: {e}")
 
-📌 Output Rules (follow exactly):
-1. Output **only raw HTML** — do NOT use Markdown formatting like ```html or any backticks.
-2. Do NOT include comments, explanations, descriptions, or summaries of the code.
-3. Wrap the entire app in standard HTML structure: <html>, <head>, and <body>.
-4. All CSS and JavaScript must be inline, using <style> and <script> inside the file.
-5. The UI must be simple, semantic, and mobile-friendly.
-6. Use async/await and error handling if JavaScript makes fetch/API calls.
-7. Use YOUR_API_KEY_HERE as a placeholder for any API keys.
-8. Do NOT use external libraries, frameworks, or CDNs unless explicitly instructed.
-9. Use the following theme for styling:
 
-🎨 Theme: "Modern Chat UI (Dark Glassy Inspired)"
-- Full dark theme using `#0f0f0f` to `#232323`
-- Rounded elements, subtle shadows, clean borders
-- Responsive layout for mobile and desktop
-- Modern fonts: "Segoe UI", "Roboto", Arial, sans-serif
-- Scrollable, flexible `.messages` container
-- Gradient buttons with hover transitions
-- Neat input area with focus styles
-
-⚠️ FINAL RULE: Your output must be ONLY valid raw HTML. No Markdown, no code fences, no extra text before or after the HTML.
-"""
-        response = openai.chat.completions.create(
-            model=model,
-            messages=[
+        
+    response = openai.chat.completions.create(
+        model=model,
+        messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": prompt}
             ],
             temperature=0.2,
-        )
+    )    
 
         # valid_html = openai.chat.completions.create(
         #     model=model,
@@ -84,9 +71,8 @@ You are a developer assistant that generates single-file HTML applications using
 
       
         
-        return response.choices[0].message.content
-    except Exception as e:
-        return f"❌ Error: {e}"
+    return response.choices[0].message.content
+    
 
     
 SetupAgent()
@@ -152,4 +138,4 @@ def save_html():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5003, host='0.0.0.0')
+    app.run(debug=True, port=3001, host='0.0.0.0')

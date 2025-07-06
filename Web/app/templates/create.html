@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Agent Chat</title>
     <!-- Add Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -65,7 +65,7 @@
                         Close
                     </button>
                     <button id="saveFile" class="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-white transition-colors">
-                        Save File
+                        Save App
                     </button>
                 </div>
             </div>
@@ -77,7 +77,7 @@
         <div class="fixed inset-0 flex items-center justify-center">
             <div class="bg-dark-200 w-full h-full flex flex-col opacity-0 translate-y-4 transition-all duration-300" id="modalContent">
                 <!-- Modal Header -->
-                <div class="flex items-center justify-between p-6 border-b border-dark-300">
+                <div class="flex items-center justify-between p-2 border-b border-dark-300">
                     <h3 id="fileContentTitle" class="text-xl font-semibold text-white"></h3>
                     <button id="closeFileContentModal" class="p-2 hover:bg-dark-300 rounded-lg transition-colors text-gray-400 hover:text-white">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -101,7 +101,7 @@
         <!-- Mobile Sidebar -->
         <aside id="projectSidebar" class="fixed inset-y-0 left-0 w-80 bg-dark-200 border-r border-dark-300 transform -translate-x-full transition-transform duration-300 ease-in-out md:hidden z-50">
             <div class="flex justify-between items-center p-4 border-b border-dark-300">
-                <h3 class="text-xl font-semibold">Generated Files</h3>
+                <h3 class="text-xl font-semibold">Apps</h3>
                 <button id="closeSidebar" class="p-2 hover:bg-dark-300 rounded-lg transition-colors">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -116,17 +116,26 @@
                                 data-file="{{ file }}">
                             <div class="flex items-center gap-3">
                                 <svg class="w-5 h-5 text-accent-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                                 </svg>
-                                <span class="text-sm font-medium">{{ file }}</span>
+                                <span class="text-sm font-medium">{{ file.replace('.html', '') }}</span>
                             </div>
                         </button>
-                        <button class="delete-file absolute right-3 top-1/2 -translate-y-1/2 p-2 opacity-0 group-hover:opacity-100 hover:bg-accent-danger/20 rounded-lg transition-all"
+                        <div class="flex absolute right-3 top-1/2 -translate-y-1/2">
+                            <button class="edit-file-btn p-2 hover:bg-accent-primary/20 rounded-lg transition-all"
+                                    data-filename="{{ file }}">
+                                <svg class="w-4 h-4 text-accent-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                            </button>
+                            <button class="delete-file p-2 hover:bg-accent-danger/20 rounded-lg transition-all"
                                 data-filename="{{ file }}">
                             <svg class="w-4 h-4 text-accent-danger" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                             </svg>
                         </button>
+                        </div>
+                        
                     </div>
                     {% endfor %}
                     {% if not user_files %}
@@ -134,36 +143,66 @@
                     {% endif %}
                 </div>
             </div>
+            <button id="clearBtn" 
+                class="inline-flex items-center gap-1.5 px-5 mx-5 py-1.5 text-xs font-medium text-gray-300 hover:text-white bg-dark-300 rounded-lg transition-colors hover:bg-dark-400 md:gap-2 md:px-4 md:py-2 md:text-sm bottom-0 absolute my-5"
+                >
+                    <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    <span class="hidden sm:inline">Clear Chat</span>
+                    <span class="sm:hidden">Clear</span>
+                </button>
         </aside>
 
         <!-- Generated Files Sidebar (Desktop) -->
         <aside class="w-80 bg-dark-200 border-r border-dark-300 hidden md:flex flex-col">
             <div class="p-6">
-                <h3 class="text-xl font-semibold mb-6">Generated Files</h3>
+                <h3 class="text-xl font-semibold mb-6">Apps</h3>
                 <div class="space-y-3">
                     {% for file in user_files %}
                     <div class="group relative bg-dark-300 rounded-xl transition-all hover:bg-dark-400">
                         <button class="file-content-btn w-full text-left block p-4 text-gray-200" 
                                 data-file="{{ file }}">
                             <div class="flex items-center gap-3">
-                                <svg class="w-5 h-5 text-accent-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <!-- <svg class="w-5 h-5 text-accent-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg>
-                                <span class="text-sm font-medium">{{ file }}</span>
+                                </svg> -->
+                                <span class="text-sm font-medium">{{ file.replace('.html', '') }}</span>
                             </div>
                         </button>
-                        <button class="delete-file absolute right-3 top-1/2 -translate-y-1/2 p-2 opacity-0 group-hover:opacity-100 hover:bg-accent-danger/20 rounded-lg transition-all"
-                                data-filename="{{ file }}">
-                            <svg class="w-4 h-4 text-accent-danger" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                        </button>
+                        <div class="flex absolute right-3 top-1/2 -translate-y-1/2">
+                            <!-- Edit file -->
+                            <button class="edit-file-btn p-2 hover:bg-accent-primary/20 rounded-lg transition-all"
+                                    data-filename="{{ file }}">
+                                <svg class="w-4 h-4 text-accent-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                            </button>
+                            <!-- Delete file -->
+                            <button class="delete-file p-2 hover:bg-accent-danger/20 rounded-lg transition-all"
+                                    data-filename="{{ file }}">
+                                <svg class="w-4 h-4 text-accent-danger" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                            </button>
+                            
+                        </div>
                     </div>
                     {% endfor %}
                     {% if not user_files %}
                     <div class="p-4 bg-dark-300 rounded-xl text-gray-400 text-sm">No files yet</div>
                     {% endif %}
+                  
                 </div>
+                <button id="clearBtn" 
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-300 hover:text-white bg-dark-300 rounded-lg transition-colors hover:bg-dark-400 md:gap-2 md:px-4 md:py-2 md:text-sm bottom-0 absolute my-5"
+                >
+                    <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    <span class="hidden sm:inline">Clear Chat</span>
+                    <span class="sm:hidden">Clear</span>
+                </button>
             </div>
         </aside>
 
@@ -189,15 +228,17 @@
                                 </svg>
                                 Home
                             </a>
-                            <a href="{{ url_for('create') }}" 
+                            
+                            <!-- <a href="{{ url_for('create') }}" 
                                class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-300 hover:text-white bg-dark-300 rounded-lg transition-colors hover:bg-dark-400">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                 </svg>
                                 Create
-                            </a>
+                            </a> -->
                         </nav>
 
+                       
                         <!-- Model Selector -->
                         <div class="relative z-10">
                             <button id="modelDropdown" 
@@ -216,12 +257,13 @@
                         </div>
                     </div>
                 </div>
+               
             </header>
 
             <!-- Messages Container -->
             <div class="flex-1 overflow-hidden relative">
                 <div id="messages" class="absolute inset-0 overflow-y-auto">
-                    <div class="max-w-3xl mx-auto p-6 space-y-6">
+                    <div class="max-w-3xl mx-auto  p-6 space-y-6">
                         <!-- Messages will be added here -->
                     </div>
                 </div>
@@ -237,15 +279,13 @@
                         <button id="sendBtn" 
                                 class="px-6 py-3 bg-accent-primary hover:bg-accent-secondary disabled:bg-dark-400 disabled:text-gray-500 rounded-xl font-medium transition-colors flex items-center gap-2"
                                 disabled>
-                            <span>Send</span>
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <span>🚀</span>
+                            <!-- <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                            </svg>
+                            </svg> -->
                         </button>
                     </div>
-                    <button id="clearBtn" 
-                            class="w-full px-6 py-3 border border-dark-400 text-gray-400 hover:text-white hover:bg-dark-300 rounded-xl transition-colors disabled:opacity-50 text-sm font-medium"
-                            disabled>Clear Chat</button>
+                   
                 </div>
             </div>
         </main>
@@ -356,7 +396,7 @@
                     const content = await response.text();
 
                     // Set modal title
-                    fileContentTitle.textContent = filename;
+                    fileContentTitle.textContent = filename.replace('.html', '');
 
                     // Create and setup iframe
                     const iframe = document.createElement('iframe');
@@ -414,6 +454,41 @@
                         hamburgerBtn.click();
                     });
                 });
+
+            }
+
+            // Initialize file editing
+            function initializeFileEditing() {
+                document.querySelectorAll('.edit-file-btn').forEach(button => {
+                    button.addEventListener('click', async (e) => {
+                        console.log("Editing file");
+                        e.preventDefault();
+
+                        const filename = button.dataset.filename;
+                        console.log(`Editing file: ${filename}`);
+                        if (filename) {
+
+                            // close hamburger menu
+                            hamburgerBtn.click();
+                            await editFile(filename);
+                        }
+                    });
+                });
+            }
+
+            // Function to edit a file
+            async function editFile(filename) {
+                console.log(`Editing file: ${filename}`);
+                // Get file content
+                const filePath = `/static/projects/{{ session['user_id'] }}/${filename}`;
+                const response = await fetch(filePath);
+                const content = await response.text();
+                console.log(`File content: ${content}`);
+                addMessage(`Editing file: ${filename}`, "user");
+                chatHistory.push({ text: `Im editing the file: ${filename}: ${content}`, sender: "user" });
+                saveChatHistory();
+                // reload generated files
+                // renderChatHistory();
             }
 
             // Initialize file deletion
@@ -524,8 +599,8 @@
                 addMessage(`Using ${name}. How can I assist you today?`, "bot");
 
                 if(selectedModel === "html_service" && messageInput) {
-                    messageInput.value = "Create me a simple todo list app. I want to be able to add, edit and delete tasks.";
-                    updateSendButtonState();
+                    // messageInput.value = "Create me a simple todo list app. I want to be able to add, edit and delete tasks.";
+                    // updateSendButtonState();
                 }
             }
 
@@ -579,6 +654,7 @@
             loadServicesConfig();
             initializeModalEvents();
             initializeFileDeletion();
+            initializeFileEditing();
             chatHistory = [];
             saveChatHistory();
             renderChatHistory();
@@ -644,7 +720,7 @@
             // Add a message to the chat
             function addMessage(text, sender = "user", save = true) {
                 const msg = document.createElement("div");
-                msg.className = `max-w-[75%] p-4 rounded-2xl mt-5 ${
+                msg.className = `max-w-[75%] p-4 rounded-2xl mt-5 mx-6 ${
                     sender === "user" 
                         ? "ml-auto bg-gradient-to-r from-blue-600 to-blue-700 rounded-br-lg" 
                         : "bg-dark-200 border border-dark-300 rounded-bl-lg"
@@ -694,13 +770,17 @@
                     console.log(`Sending query to ${selectedModel}`);
                     console.log("Query:", text);
                     console.log("URL:", selectedUrl);
+                    console.log("Chat history:", chatHistory);
+                    console.log("Last message:", chatHistory.slice(-1)[0].text);
+                    // last 5 messages
+                    const last5Messages = chatHistory.slice(-5).map(msg => msg.text).join("\n");
                     
                     const response = await fetch(selectedUrl, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify({ query: text })
+                        body: JSON.stringify({ query: last5Messages })
                     });
                     
                     if (!response.ok) {

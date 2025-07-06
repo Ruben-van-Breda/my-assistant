@@ -13,14 +13,14 @@
        
         {
             "id": "html_service",
-            "name": "HTML Service",
-            "description": "HTML generation and processing",
-            "icon": "🌐",
+            "name": "App Builder",
+            "description": "App Builder👷",
+            "icon": "📱",
             "url": {
                 "development": "http://127.0.0.1:3001/query",
                 "production": "https://my-assistant.co.za/html_service/query"
             }
         }
     ],
-    "environment": "production"
+    "environment": "development"
 } 

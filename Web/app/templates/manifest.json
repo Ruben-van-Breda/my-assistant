@@ -1,0 +1,16 @@
+{
+    "name": "Agent Chat",
+    "short_name": "AgentChat",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#000000",
+    "theme_color": "#000000",
+    "orientation": "portrait",
+    "icons": [
+      {
+        "src": "favicon.ico",
+        "sizes": "16x16 32x32 48x48 64x64",
+        "type": "image/x-icon"
+      }
+    ]
+  } 

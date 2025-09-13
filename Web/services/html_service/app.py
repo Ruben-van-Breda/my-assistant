@@ -74,18 +74,14 @@ def Query(prompt, model="gpt-4"):
     return response.choices[0].message.content
     
 
-    
+# Initialize OpenAI client
 SetupAgent()
 
+# Routes
 @app.route('/')
 def home():
     # set window title
-  
-
-
     return jsonify({"message": "HTML Service is running!"})
-
-    return response
 
 @app.route('/health')
 def health_check():

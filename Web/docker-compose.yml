@@ -22,9 +22,11 @@ services:
   html_service:
     build: ./services/html_service
     ports:
-      - "5003:5003"
+      - "5003:3001"
     networks:
       - app_network
+
+  
 
   nginx:
     image: nginx:latest

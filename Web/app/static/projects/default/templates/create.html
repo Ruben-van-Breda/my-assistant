@@ -782,6 +782,9 @@
                                 const permanentSaveData = await permanentSaveResponse.json();
                                 if (permanentSaveData.saved) {
                                     addMessage(`HTML app saved successfully as ${filename.value}!`, "bot");
+                                    // Update the user files
+                                    user_files = load_user_files();
+                                    project_files = get_project_files();
                                     closeModal();
                                 }
                             } catch (error) {
@@ -790,7 +793,7 @@
                         });
                         
                         // Add message with link after preview is shown
-                        addMessage(`HTML generated successfully! You can preview and save it now.`, "bot");
+                        addMessage(`HTML generated successfully! You can preview and save it now.` + html , "bot");
                     } else {
                         addMessage(data.response || JSON.stringify(data), "bot");
                     }

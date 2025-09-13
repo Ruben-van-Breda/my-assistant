@@ -233,35 +233,7 @@ def get_services_config():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-def load_user_files():
-    try:
-        print("Loading user files")
-        user_id = session.get("userId")
-        if not user_id:
-            print("No userId in session")
-            return []
 
-        # Get user's directory in static/projects
-        user_dir = os.path.join(PROJECTS_DIR, user_id)
-        
-        # Ensure directory exists
-        if not os.path.exists(user_dir):
-            print("User directory does not exist")
-            os.makedirs(user_dir, exist_ok=True)
-            return []
-
-        # Load and filter files
-        try:
-            files = [f for f in os.listdir(user_dir) if f.endswith('.html')]
-            print("User files loaded:", files)
-            return files
-        except Exception as e:
-            print(f"Error listing files: {e}")
-            return []
-
-    except Exception as e:
-        print(f"Error in load_user_files: {e}")
-        return []
 
 @app.route('/save_html', methods=['POST'])
 def save_html():
@@ -299,6 +271,12 @@ def save_html():
         # URL is relative to /static since that's how Flask serves static files
         relative_url = f'projects/{user_id}/{safe_filename}'
         
+        # Refresh the user files
+        user_files = load_user_files()
+        project_files = get_project_files()
+        
+
+
         return jsonify({
             'message': 'HTML saved successfully' if should_save else 'HTML generated successfully',
             'url': f'/static/{relative_url}',
@@ -358,6 +336,38 @@ def login():
 def logout():
     Auth.logout()
     return redirect(url_for('login'))
+
+
+def load_user_files():
+    try:
+        print("Loading user files")
+        user_id = session.get("userId")
+        if not user_id:
+            print("No userId in session")
+            return []
+
+        # Get user's directory in static/projects
+        user_dir = os.path.join(PROJECTS_DIR, user_id)
+        
+        # Ensure directory exists
+        if not os.path.exists(user_dir):
+            print("User directory does not exist")
+            os.makedirs(user_dir, exist_ok=True)
+            return []
+
+        # Load and filter files
+        try:
+            files = [f for f in os.listdir(user_dir) if f.endswith('.html')]
+            print("User files loaded:", files)
+            return files
+        except Exception as e:
+            print(f"Error listing files: {e}")
+            return []
+
+    except Exception as e:
+        print(f"Error in load_user_files: {e}")
+        return []
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)

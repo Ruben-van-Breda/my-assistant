@@ -17,7 +17,7 @@
             "description": "App Builder👷",
             "icon": "📱",
             "url": {
-                "development": "http://127.0.0.1:3001/query",
+                "development": "http://127.0.0.1:5003/query",
                 "production": "https://my-assistant.co.za/html_service/query"
             }
         }

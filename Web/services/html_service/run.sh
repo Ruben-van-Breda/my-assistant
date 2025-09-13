@@ -1,7 +1,7 @@
 #!/bin/bash
 
 service_name="html_service"
-port=5003
+port=3001
 echo "Building $service_name service"
 echo "Using port $port"
 echo "----------"

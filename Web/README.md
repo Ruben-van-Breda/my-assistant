@@ -55,7 +55,7 @@ The application integrates with the following microservices:
 
 2. **HTML Service (App Builder)**
    - Purpose: Application building and generation
-   - Development URL: http://127.0.0.1:5003/query
+   - Development URL: http://127.0.0.1:3001/query
    - Production URL: https://my-assistant.co.za/html_service/query
 
 ## Project Structure
@@ -80,6 +80,14 @@ The application integrates with the following microservices:
 ├── run.sh            # Script to run the project
 └── run_docker.sh     # Script to run Docker containers
 \`\`\`
+
+## Project Status
+
+Current development status based on TASKS.md:
+- [x] Create the folder structure for Website flask app
+- [x] Dockerize flask app
+- [x] Create a run.sh port 8080
+- [ ] Create nginx server config (In Progress)
 
 ## Getting Started
 
@@ -173,6 +181,7 @@ The application uses Docker and Docker Compose to orchestrate multiple services.
    - Exposed on port 8080 (host machine)
    - Handles SSL termination in production
    - Configured via `./nginx/nginx.conf/nginx.conf`
+   - Note: Nginx configuration is currently under development (see Project Status section)
 
 ### Network Configuration
 
@@ -232,9 +241,15 @@ The application uses Docker and Docker Compose to orchestrate multiple services.
 
 ### Accessing Services
 
+Development URLs:
 - Main Application: `http://localhost:8080`
-- Base Chat Service: `http://localhost:8080/base_chat/`
-- HTML Service: `http://localhost:8080/html_service/`
+- Base Chat Service: `http://localhost:3000/query`
+- HTML Service: `http://localhost:3001/query`
+
+Production URLs:
+- Main Application: `https://my-assistant.co.za`
+- Base Chat Service: `https://my-assistant.co.za/base_chat/query`
+- HTML Service: `https://my-assistant.co.za/html_service/query`
 
 ## License
 

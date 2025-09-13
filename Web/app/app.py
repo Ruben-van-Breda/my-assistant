@@ -233,7 +233,11 @@ def get_services_config():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-
+@app.route('/app_gallery')
+@login_required
+def app_gallery():
+    project_files = get_project_files()
+    return render_template('app_gallery.html', project_files=project_files)
 
 @app.route('/save_html', methods=['POST'])
 def save_html():

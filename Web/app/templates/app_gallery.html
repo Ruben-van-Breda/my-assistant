@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            100: '#121212',
+                            200: '#1E1E1E',
+                            300: '#2D2D2D',
+                        },
+                        light: {
+                            100: '#FFFFFF',
+                            200: '#F3F4F6',
+                            300: '#E5E7EB',
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04)',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="min-h-screen transition-colors duration-300" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true' }" :class="darkMode ? 'bg-dark-100 text-gray-200' : 'bg-light-100 text-gray-800'">
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 backdrop-blur-sm z-10 transition-colors duration-300"
+         :class="darkMode ? 'bg-dark-200/80 border-dark-300' : 'bg-light-200/80 border-light-300'"
+         x-data="{ mobileMenuOpen: false }">
+        <div class="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
+            <div class="flex space-x-4">
+                <a href="{{ url_for('index') }}" 
+                   class="flex items-center transition-colors duration-300"
+                   :class="darkMode ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    <span class="ml-2">Back</span>
+                </a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <!-- Theme Toggle -->
+                <button @click="darkMode = !darkMode; localStorage.setItem('darkMode', darkMode)"
+                        class="p-2 rounded-lg transition-colors duration-300"
+                        :class="darkMode ? 'bg-dark-300 text-yellow-400 hover:bg-dark-200' : 'bg-light-300 text-gray-600 hover:bg-light-200'">
+                    <svg x-show="darkMode" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                    <svg x-show="!darkMode" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: none;">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                    </svg>
+                </button>
+                <!-- Create New Button -->
+                <a href="{{ url_for('create') }}" 
+                   class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center">
+                    <span class="mr-2">Create New</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- App Grid -->
+    <main class="max-w-7xl mx-auto px-4 pt-20 pb-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {% for file in project_files %}
+            <div class="group rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer"
+                 :class="darkMode ? 'bg-dark-200' : 'bg-light-200'"
+                 onclick="handleClick(event, '{{ file.name }}')"
+                 oncontextmenu="handleContextMenu(event, '{{ file.name }}')"
+                 ontouchstart="handleTouchStart(event, '{{ file.name }}')"
+                 ontouchend="handleTouchEnd(event)">
+                <div class="p-6">
+                    <div class="flex items-center gap-4">
+                        <div class="text-3xl p-3 rounded-xl transition-colors duration-300"
+                             :class="darkMode ? 'bg-dark-300' : 'bg-light-300'">
+                            {% if file.type == 'html' %}
+                            🚀
+                            {% elif file.type == 'code' %}
+                            <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                            </svg>
+                            {% elif file.type == 'style' %}
+                            <svg class="w-8 h-8 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                            </svg>
+                            {% elif file.type == 'data' %}
+                            <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+                            </svg>
+                            {% else %}
+                            <svg class="w-8 h-8" :class="darkMode ? 'text-gray-400' : 'text-gray-600'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            {% endif %}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-xl font-medium transition-colors group-hover:text-blue-500"
+                                :class="darkMode ? 'text-white' : 'text-gray-900'">
+                                {{ file.name.replace('.html', '') }}
+                            </h3>
+                            <p class="mt-1 text-sm transition-colors duration-300"
+                               :class="darkMode ? 'text-gray-400' : 'text-gray-600'">
+                                Click to open app
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="h-1.5 w-full bg-gradient-to-r from-blue-500 to-purple-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+
+    <!-- File Content Modal -->
+    <div id="fileContentModal" 
+         class="fixed inset-0 z-50 hidden opacity-0 transition-opacity duration-300"
+         :class="darkMode ? 'bg-black/95' : 'bg-gray-900/90'">
+        <div class="fixed inset-0 flex items-center justify-center">
+            <div class="w-full h-full flex flex-col opacity-0 translate-y-4 transition-all duration-300"
+                 :class="darkMode ? 'bg-dark-200' : 'bg-light-200'"
+                 id="modalContent">
+                <div class="flex items-center justify-between p-4 border-b transition-colors duration-300"
+                     :class="darkMode ? 'border-dark-300' : 'border-light-300'">
+                    <h3 id="fileContentTitle" 
+                        class="text-xl font-semibold flex items-center transition-colors duration-300"
+                        :class="darkMode ? 'text-white' : 'text-gray-900'">
+                        <span class="text-2xl mr-3">🚀</span>
+                        <span></span>
+                    </h3>
+                    <button id="closeFileContentModal" 
+                            class="p-2 rounded-lg transition-colors"
+                            :class="darkMode ? 'hover:bg-dark-300 text-gray-400 hover:text-white' : 'hover:bg-light-300 text-gray-600 hover:text-gray-900'">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="flex-1 overflow-hidden">
+                    <div id="fileContentPreview" class="h-full"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Context Menu -->
+    <div id="contextMenu" 
+         class="fixed hidden transition-opacity duration-200 rounded-lg shadow-lg z-50"
+         :class="darkMode ? 'bg-dark-200 border border-dark-300' : 'bg-light-200 border border-light-300'">
+        <div class="py-1">
+            <button id="editAppBtn" 
+                    class="w-full px-4 py-2 text-left transition-colors duration-200 flex items-center gap-2"
+                    :class="darkMode ? 'text-gray-200 hover:bg-dark-300' : 'text-gray-800 hover:bg-light-300'">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                Edit App
+            </button>
+            <button id="deleteAppBtn" 
+                    class="w-full px-4 py-2 text-left transition-colors duration-200 flex items-center gap-2 text-red-500 hover:text-red-600"
+                    :class="darkMode ? 'hover:bg-dark-300' : 'hover:bg-light-300'">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                Delete App
+            </button>
+            <button id="viewSourceBtn" 
+                    class="w-full px-4 py-2 text-left transition-colors duration-200 flex items-center gap-2"
+                    :class="darkMode ? 'text-gray-200 hover:bg-dark-300' : 'text-gray-800 hover:bg-light-300'">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                </svg>
+                View Source
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Modal elements
+        const fileContentModal = document.getElementById('fileContentModal');
+        const fileContentTitle = document.getElementById('fileContentTitle').querySelector('span:last-child');
+        const fileContentPreview = document.getElementById('fileContentPreview');
+        const closeFileContentModal = document.getElementById('closeFileContentModal');
+        const modalContent = document.getElementById('modalContent');
+        
+        // Context menu elements
+        const contextMenu = document.getElementById('contextMenu');
+        const editAppBtn = document.getElementById('editAppBtn');
+        const deleteAppBtn = document.getElementById('deleteAppBtn');
+        const viewSourceBtn = document.getElementById('viewSourceBtn');
+        let currentFile = null;
+
+        // Function to show modal with animation
+        function showModal() {
+            fileContentModal.style.display = 'block';
+            // Trigger reflow
+            fileContentModal.offsetHeight;
+            fileContentModal.classList.remove('opacity-0');
+            modalContent.classList.remove('opacity-0', 'translate-y-4');
+        }
+
+        // Function to hide modal with animation
+        function hideModal() {
+            fileContentModal.classList.add('opacity-0');
+            modalContent.classList.add('opacity-0', 'translate-y-4');
+            setTimeout(() => {
+                fileContentModal.style.display = 'none';
+                fileContentPreview.innerHTML = ''; // Clear content
+            }, 300);
+        }
+
+        // Function to view file content
+        async function viewFileContent(filename) {
+            try {
+                // Use the get_file_content endpoint to fetch file content
+                const response = await fetch(`/get_file_content?path=${encodeURIComponent(filename)}`);
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to load file');
+                }
+
+                // Set modal title
+                fileContentTitle.textContent = filename.replace('.html', '');
+
+                // Create and setup iframe
+                const iframe = document.createElement('iframe');
+                iframe.className = 'w-full h-full border-0';
+                fileContentPreview.innerHTML = '';
+                fileContentPreview.appendChild(iframe);
+
+                // Write content to iframe
+                const iframeDoc = iframe.contentWindow.document;
+                iframeDoc.open();
+                iframeDoc.write(data.content);
+                iframeDoc.close();
+
+                // Show modal
+                showModal();
+            } catch (error) {
+                console.error('Error loading file:', error);
+                alert('Error loading file: ' + error.message);
+            }
+        }
+
+        // Close modal when clicking close button
+        closeFileContentModal.addEventListener('click', hideModal);
+
+        // Close modal when clicking outside
+        fileContentModal.addEventListener('click', (e) => {
+            if (e.target === fileContentModal) {
+                hideModal();
+            }
+        });
+
+        // Close modal on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                if (!fileContentModal.classList.contains('opacity-0')) {
+                    hideModal();
+                }
+                hideContextMenu();
+            }
+        });
+
+        // Context menu handling
+        let touchTimeout;
+        const LONG_PRESS_DURATION = 500; // milliseconds
+
+        function handleClick(event, filename) {
+            if (!event.target.closest('#contextMenu')) {
+                viewFileContent(filename);
+            }
+        }
+
+        function handleContextMenu(event, filename) {
+            event.preventDefault();
+            showContextMenu(event.pageX, event.pageY, filename);
+        }
+
+        function handleTouchStart(event, filename) {
+            touchTimeout = setTimeout(() => {
+                const touch = event.touches[0];
+                showContextMenu(touch.pageX, touch.pageY, filename);
+            }, LONG_PRESS_DURATION);
+        }
+
+        function handleTouchEnd(event) {
+            clearTimeout(touchTimeout);
+        }
+
+        function showContextMenu(x, y, filename) {
+            currentFile = filename;
+            contextMenu.style.display = 'block';
+            
+            // Position the menu
+            const menuRect = contextMenu.getBoundingClientRect();
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+            
+            // Adjust position if menu would go off screen
+            if (x + menuRect.width > windowWidth) {
+                x = windowWidth - menuRect.width;
+            }
+            if (y + menuRect.height > windowHeight) {
+                y = windowHeight - menuRect.height;
+            }
+            
+            contextMenu.style.left = x + 'px';
+            contextMenu.style.top = y + 'px';
+            
+            // Add click outside listener
+            setTimeout(() => {
+                document.addEventListener('click', hideContextMenu);
+            }, 0);
+        }
+
+        function hideContextMenu() {
+            contextMenu.style.display = 'none';
+            document.removeEventListener('click', hideContextMenu);
+        }
+
+        // Context menu actions
+        editAppBtn.addEventListener('click', () => {
+            hideContextMenu();
+            window.location.href = `/create?edit=${encodeURIComponent(currentFile)}`;
+        });
+
+        deleteAppBtn.addEventListener('click', async () => {
+            hideContextMenu();
+            if (confirm(`Are you sure you want to delete ${currentFile}?`)) {
+                try {
+                    const response = await fetch('/delete_file', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ filename: currentFile })
+                    });
+
+                    if (response.ok) {
+                        window.location.reload();
+                    } else {
+                        const data = await response.json();
+                        alert('Error deleting file: ' + (data.error || 'Unknown error'));
+                    }
+                } catch (error) {
+                    alert('Error deleting file: ' + error.message);
+                }
+            }
+        });
+
+        viewSourceBtn.addEventListener('click', async () => {
+            hideContextMenu();
+            try {
+                const response = await fetch(`/get_file_content?path=${encodeURIComponent(currentFile)}`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    console.log('Source code for ' + currentFile + ':', data.content);
+                } else {
+                    throw new Error(data.error || 'Failed to load source');
+                }
+            } catch (error) {
+                alert('Error viewing source: ' + error.message);
+            }
+        });
+    </script>
+</body>
+</html>

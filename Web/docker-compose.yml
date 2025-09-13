@@ -42,6 +42,7 @@ services:
       - html_service
     networks:
       - app_network
+    
 
 networks:
   app_network:

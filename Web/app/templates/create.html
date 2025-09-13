@@ -671,12 +671,12 @@
             saveChatHistory();
             renderChatHistory();
             selectService(servicesConfig.services[0].id, servicesConfig.services[0].url[servicesConfig.environment], servicesConfig.services[0].name);
-           
+            console.log(servicesConfig);
 
             // Service URLs mapping
             const serviceUrls = {
                 'service1': 'https://my-assistant.co.za/service1/query',
-                'base_chat':  'http://127.0.0.1:5002/query', //'https://my-assistant.co.za/base_chat/query',
+                'base_chat':  'http://127.0.0.1:3000/query', //'https://my-assistant.co.za/base_chat/query',
                 'chatgpt_service': 'https://my-assistant.co.za/chatgpt_service/query',
                 'data_analyser': 'https://my-assistant.co.za/data_analyser/query',
                 'html_service': 'https://my-assistant.co.za/html_service/query'

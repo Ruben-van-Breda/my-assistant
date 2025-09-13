@@ -2,11 +2,11 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 import openai
-
-
 import os
+
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
+# Configure CORS to allow requests from your frontend
+CORS(app)
 
 
 
@@ -52,13 +52,8 @@ SetupAgent()
 
 @app.route('/')
 def home():
-    # set window title
-  
-
-
     return jsonify({"message": "ChatGPT Service is running!"})
 
-    return response
 
 @app.route('/health')
 def health_check():

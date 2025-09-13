@@ -3,18 +3,28 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <link rel="manifest" href="manifest.json">
   <!-- favicon -->
   <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
-  <title>My Assistant</title>
+  <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <title>My Assistant - Your AI Development Partner</title>
   <style>
     /* Reset & Base */
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --primary: #4361ee;
+      --primary-light: #4895ef;
+      --secondary: #3f37c9;
+      --accent: #4cc9f0;
+      --text: #2b2d42;
+      --text-light: #555b6e;
+      --background: #f8f9fa;
+    }
     body {
-      font-family: 'Segoe UI', Roboto, sans-serif;
-      color: #222;
+      font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+      color: var(--text);
       line-height: 1.6;
-      background: #fafafa;
+      background: var(--background);
     }
     a { text-decoration: none; color: inherit; }
 
@@ -55,114 +65,289 @@
     .hero {
       display: flex;
       align-items: center;
-      justify-content: center;
-      text-align: center;
+      justify-content: space-between;
       min-height: 100vh;
-      padding: 0 1rem;
-      background: linear-gradient(135deg, #4f9aff 0%, #76d7ff 100%);
+      padding: 2rem 8%;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
       color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 80%;
+      height: 200%;
+      background: radial-gradient(circle, var(--accent) 0%, transparent 60%);
+      opacity: 0.1;
+      transform: rotate(-45deg);
     }
     .hero .inner {
-      max-width: 700px;
+      max-width: 600px;
+      text-align: left;
+      z-index: 1;
+    }
+    .hero .illustration {
+      flex: 0 0 45%;
+      position: relative;
+      z-index: 1;
+    }
+    .hero .illustration img {
+      width: 100%;
+      height: auto;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+      animation: float 6s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
     }
     .hero h1 {
-      font-size: 3rem;
-      margin-bottom: 1rem;
-      position: relative;
-      display: inline-block;
+      font-size: 3.5rem;
+      line-height: 1.2;
+      margin-bottom: 1.5rem;
+      font-weight: 700;
     }
-    .hero h1::after {
-      content: '';
+    .hero h1 span {
+      color: var(--accent);
+      font-size: 4rem;
       display: block;
-      width: 60%;
-      height: 4px;
-      background: #fff;
-      margin: 0.5rem auto 0;
-      border-radius: 2px;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--primary-light) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 2px 20px rgba(76, 201, 240, 0.1);
     }
     .hero p {
-      font-size: 1.125rem;
-      margin-bottom: 2rem;
+      font-size: 1.25rem;
+      margin-bottom: 2.5rem;
       opacity: 0.9;
+      line-height: 1.8;
+    }
+    .hero .buttons {
+      display: flex;
+      gap: 1rem;
     }
     .hero .btn {
-      padding: 0.75rem 2rem;
-      background: #fff;
-      color: #4f9aff;
+      padding: 1rem 2.5rem;
+      font-size: 1.1rem;
       font-weight: 600;
       border: none;
-      border-radius: 999px;
+      border-radius: 12px;
       cursor: pointer;
-      transition: background 0.3s ease, transform 0.2s ease;
+      transition: all 0.3s ease;
     }
-    .hero .btn:hover {
-      background: #f0f0f0;
-      transform: translateY(-2px);
+    .hero .btn-primary {
+      background: #fff;
+      color: var(--primary);
+    }
+    .hero .btn-primary:hover {
+      background: var(--accent);
+      color: #fff;
+      transform: translateY(-3px);
+    }
+    .hero .btn-secondary {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      backdrop-filter: blur(10px);
+    }
+    .hero .btn-secondary:hover {
+      background: rgba(255,255,255,0.2);
+      transform: translateY(-3px);
+    }
+
+    /* App Gallery */
+    .app-gallery {
+      padding: 6rem 8%;
+      background: var(--background);
+      position: relative;
+      overflow: hidden;
+    }
+    .app-gallery::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(67, 97, 238, 0.05) 0%, rgba(76, 201, 240, 0.05) 100%);
+      z-index: 0;
+    }
+    .gallery-content {
+      position: relative;
+      z-index: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .app-gallery h2 {
+      font-size: 2.5rem;
+      text-align: center;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .app-gallery > p {
+      text-align: center;
+      font-size: 1.2rem;
+      color: var(--text-light);
+      margin-bottom: 3rem;
+    }
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+    .gallery-item {
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+    }
+    .gallery-item:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+    .gallery-item img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+    .gallery-item h4 {
+      padding: 1.5rem 1.5rem 0.5rem;
+      font-size: 1.25rem;
+      color: var(--text);
+    }
+    .gallery-item .tag {
+      display: inline-block;
+      padding: 0.5rem 1.5rem 1.5rem;
+      color: var(--primary);
+      font-size: 0.9rem;
+      font-weight: 500;
     }
 
     /* Features */
     .features {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-around;
-      padding: 4rem 2rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2.5rem;
+      padding: 6rem 8%;
       background: #fff;
     }
     .feature {
-      flex: 1 1 280px;
-      margin: 1rem;
-      padding-bottom: 2rem;
-      text-align: center;
-      border-bottom: 3px solid #e0e0e0;
+      background: var(--background);
+      border-radius: 20px;
+      padding: 2rem;
+      text-align: left;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .feature:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    }
+    .feature::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+    }
+    .feature img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
     }
     .feature h3 {
-      font-size: 1.5rem;
-      margin-bottom: 0.5rem;
-      position: relative;
-    }
-    .feature h3::after {
-      content: '';
-      display: block;
-      width: 40px;
-      height: 3px;
-      background: #4f9aff;
-      margin: 0.5rem auto 0;
+      font-size: 1.75rem;
+      margin-bottom: 1rem;
+      color: var(--text);
+      font-weight: 600;
     }
     .feature p {
-      margin-top: 1rem;
-      color: #555;
+      font-size: 1.1rem;
+      color: var(--text-light);
+      line-height: 1.7;
     }
 
     /* Call to Action */
     .cta {
       text-align: center;
-      padding: 3rem 2rem;
-      background: #f5f7fa;
+      padding: 8rem 2rem;
+      background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=2000&q=80') center/cover;
+      opacity: 0.1;
+      mix-blend-mode: overlay;
+    }
+    .cta .container {
+      position: relative;
+      z-index: 1;
+      max-width: 800px;
+      margin: 0 auto;
     }
     .cta h2 {
-      font-size: 2rem;
-      margin-bottom: 1rem;
+      font-size: 3rem;
+      margin-bottom: 1.5rem;
+      font-weight: 700;
+    }
+    .cta p {
+      font-size: 1.25rem;
+      margin-bottom: 2.5rem;
+      opacity: 0.9;
     }
     .cta .btn-secondary {
-      padding: 0.75rem 2rem;
-      background: #4f9aff;
-      color: #fff;
+      padding: 1rem 3rem;
+      background: #fff;
+      color: var(--primary);
       border: none;
-      border-radius: 999px;
+      border-radius: 12px;
       font-weight: 600;
+      font-size: 1.1rem;
       cursor: pointer;
-      transition: background 0.3s ease;
+      transition: all 0.3s ease;
     }
     .cta .btn-secondary:hover {
-      background: #3a7dd9;
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+      background: var(--accent);
+      color: #fff;
     }
 
     /* Footer */
     footer {
       text-align: center;
-      padding: 2rem 1rem;
-      font-size: 0.875rem;
-      color: #888;
+      padding: 4rem 2rem;
+      background: var(--text);
+      color: #fff;
+    }
+    footer a {
+      color: var(--accent);
+      transition: color 0.3s ease;
+    }
+    footer a:hover {
+      color: var(--primary-light);
     }
 
     /* Sidebar nav */
@@ -209,10 +394,85 @@
     }
 
     /* Responsive */
+    @media (max-width: 1024px) {
+      .app-gallery {
+        padding: 4rem 2rem;
+      }
+      .app-gallery h2 {
+        font-size: 2rem;
+      }
+      .gallery-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+      }
+      .hero {
+        flex-direction: column;
+        text-align: center;
+        padding: 6rem 2rem;
+      }
+      .hero .inner {
+        max-width: 100%;
+        margin-bottom: 3rem;
+      }
+      .hero .buttons {
+        justify-content: center;
+      }
+      .hero .illustration {
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+      }
+      .features {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        padding: 4rem 2rem;
+      }
+    }
+
     @media (max-width: 768px) {
-      .hero h1 { font-size: 2.25rem; }
-      .features { flex-direction: column; align-items: center; }
-      header { padding: 1rem 1rem; }
+      header {
+        padding: 1rem;
+      }
+      header nav {
+        display: none;
+      }
+      .hero h1 {
+        font-size: 2.5rem;
+      }
+      .hero h1 span {
+        font-size: 3rem;
+        margin-bottom: 0.75rem;
+      }
+      .hero p {
+        font-size: 1.1rem;
+      }
+      .hero .buttons {
+        flex-direction: column;
+        gap: 1rem;
+      }
+      .hero .btn {
+        width: 100%;
+      }
+      .cta h2 {
+        font-size: 2.25rem;
+      }
+      .feature {
+        margin: 0;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero h1 {
+        font-size: 2rem;
+      }
+      .feature h3 {
+        font-size: 1.5rem;
+      }
+      .cta {
+        padding: 4rem 1.5rem;
+      }
+      .cta h2 {
+        font-size: 2rem;
+      }
     }
   </style>
 </head>
@@ -238,36 +498,70 @@
 
   <section class="hero">
     <div class="inner">
-      <h1>Power Your Business with AI</h1>
-      <p>Seamless integration, lightning-fast inference, and easy-to-use APIs to supercharge your product.</p>
-      <button class="btn" onclick="window.location.href='{{ url_for('home') }}'">Home</button>
-      <button class="btn" onclick="window.location.href='{{ url_for('create') }}'">Getting Started</button>
+      <h1><span>Make Your Own Applications</span><br>with AI-Powered Assistance</h1>
+      <p>Turn your ideas into reality! Create custom applications without complex coding, powered by advanced AI technology. Build exactly what you need, the way you want it.</p>
+      <div class="buttons">
+        <button class="btn btn-primary" onclick="window.location.href='{{ url_for('create') }}'">Start Building</button>
+        <button class="btn btn-secondary" onclick="window.location.href='#features'">Learn More</button>
+      </div>
+    </div>
+    <div class="illustration">
+      <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80" alt="Team collaboratively building applications">
+    </div>
+  </section>
+
+  <section class="app-gallery">
+    <div class="gallery-content">
+      <h2>Your Personal App Gallery</h2>
+      <p>Build once, use forever. Create a collection of custom applications tailored to your specific needs.</p>
+      <div class="gallery-grid">
+        <div class="gallery-item">
+          <img src="https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?auto=format&fit=crop&w=800&q=80" alt="Task Management App">
+          <h4>Task Manager</h4>
+          <span class="tag">Productivity</span>
+        </div>
+        <div class="gallery-item">
+          <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80" alt="Knowledge Base App">
+          <h4>Knowledge Hub</h4>
+          <span class="tag">Learning</span>
+        </div>
+        <div class="gallery-item">
+          <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=800&q=80" alt="Analytics Dashboard">
+          <h4>Data Insights</h4>
+          <span class="tag">Analytics</span>
+        </div>
+      </div>
     </div>
   </section>
 
   <section id="features" class="features">
     <div class="feature">
-      <h3>Real-Time Chat</h3>
-      <p>Engage users with context-aware, conversational AI that responds instantly.</p>
+      <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80" alt="AI Chat Interface">
+      <h3>Save & Reuse</h3>
+      <p>Every application you create is automatically saved to your personal gallery. Access, modify, and reuse them anytime to solve similar challenges.</p>
     </div>
     <div class="feature">
-      <h3>Knowledge Aware</h3>
-      <p>Vectorize, Use your existing database.</p>
+      <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80" alt="Knowledge Base">
+      <h3>Custom Solutions Library</h3>
+      <p>Build a diverse collection of applications - from task automation to data analysis. Your personal app gallery grows with your needs.</p>
     </div>
     <div class="feature">
-      <h3>Create application using your business tools</h3>
-      <p>Train and deploy your own models or choose from our pre-trained library.</p>
+      <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80" alt="Custom Applications">
+      <h3>Share & Collaborate</h3>
+      <p>Share your custom applications with team members or keep them private. Collaborate on app development and build a shared resource library.</p>
     </div>
   </section>
 
   <section class="cta">
-    <h2>Ready to accelerate with AI?</h2>
-    <button class="btn-secondary" onclick="window.location.href='{{ url_for('create') }}'">Start Your Trial</button>
+    <div class="container">
+      <h2>Ready to Transform Your Workflow?</h2>
+      <p>Join thousands of businesses already using our AI assistant to boost productivity and innovation.</p>
+      <button class="btn-secondary" onclick="window.location.href='{{ url_for('create') }}'">Get Started Now</button>
+    </div>
   </section>
 
   <footer id="contact">
     &copy; 2025 My Assistant • <a href="mailto:support@myassistant.co.za">support@myassistant.co.za</a>
-  </footer>
   </footer>
 
   <script>

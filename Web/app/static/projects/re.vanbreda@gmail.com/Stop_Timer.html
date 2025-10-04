@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Timer App</title>
+    <style>
+      body {
+        background-color: #0f0f0f;
+        font-family: "Segoe UI", "Roboto", Arial, sans-serif;
+        color: #fff;
+      }
+      #app {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+      #timer {
+        font-size: 3em;
+        border: 2px solid #232323;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+      }
+      #start, #reset {
+        background: linear-gradient(45deg, #ff6b6b, #f093fb);
+        border: none;
+        color: #fff;
+        padding: 10px 20px;
+        margin: 10px;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      #start:hover, #reset:hover {
+        background: linear-gradient(45deg, #f093fb, #ff6b6b);
+      }
+    </style>
+  </head>
+  <body>
+    <main id="app">
+      <div id="timer">00:00:00</div>
+      <div>
+        <button id="start">Start</button>
+        <button id="reset">Reset</button>
+      </div>
+    </main>
+    <script>
+      'use strict';
+      let count = 0;
+      let intervalId = null;
+      const timerElement = document.getElementById('timer');
+      const startButton = document.getElementById('start');
+      const resetButton = document.getElementById('reset');
+
+      function updateTimer() {
+        const hours = Math.floor(count / 3600);
+        const minutes = Math.floor((count % 3600) / 60);
+        const seconds = count % 60;
+        timerElement.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+      }
+
+      startButton.addEventListener('click', () => {
+        if (intervalId) {
+          clearInterval(intervalId);
+          intervalId = null;
+          startButton.textContent = 'Start';
+        } else {
+          intervalId = setInterval(() => {
+            count++;
+            updateTimer();
+          }, 1000);
+          startButton.textContent = 'Stop';
+        }
+      });
+
+      resetButton.addEventListener('click', () => {
+        clearInterval(intervalId);
+        intervalId = null;
+        count = 0;
+        updateTimer();
+        startButton.textContent = 'Start';
+      });
+
+      updateTimer();
+    </script>
+  </body>
+</html>

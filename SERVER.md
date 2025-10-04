@@ -1,4 +1,6 @@
 sudo nano /etc/nginx/sites-available/my-assistant
+
+# Test the configuration
 sudo nginx -t
 sudo systemctl reload nginx
 sudo ln -sf /etc/nginx/sites-available/my-assistant /etc/nginx/sites-enabled/default

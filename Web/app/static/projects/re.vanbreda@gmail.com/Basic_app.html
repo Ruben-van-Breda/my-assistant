@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf+8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Basic App</title>
+    <style>
+      body {
+        font-family: "Segoe UI", "Roboto", Arial, sans-serif;
+        background-color: #0f0f0f;
+        color: #fff;
+      }
+      #app {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      button {
+        background: linear-gradient(to right, #232323, #0f0f0f);
+        border: none;
+        border-radius: 5px;
+        color: #fff;
+        padding: 10px 20px;
+        cursor: pointer;
+        transition: background 0.5s;
+      }
+      button:hover {
+        background: linear-gradient(to right, #0f0f0f, #232323);
+      }
+    </style>
+  </head>
+  <body>
+    <main id="app">
+      <h1>Welcome to the Basic App</h1>
+      <button id="clickMe">Click me!</button>
+    </main>
+    <script>
+      'use strict';
+      document.getElementById('clickMe').addEventListener('click', function() {
+        alert('Button clicked!');
+      });
+    </script>
+  </body>
+</html>

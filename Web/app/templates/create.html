@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
       <!-- Manifest and status bar -->
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Agent Chat</title>
@@ -63,33 +63,38 @@
 </head>
 <body class="bg-dark-100 text-white h-screen-dynamic flex flex-col overflow-hidden">
     <!-- Add Modal for Preview and Save -->
-    <div id="previewModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
-        <div class="bg-dark-200 rounded-lg w-full max-w-4xl mx-4 max-h-[90vh] flex flex-col">
-            <div class="p-4 border-b border-dark-300 flex items-center justify-between">
-                <h3 class="text-lg font-semibold">Preview Generated App</h3>
-                <button id="closePreviewModal" class="p-2 hover:bg-dark-300 rounded-lg transition-colors">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
-            <div class="flex-1 overflow-auto p-4">
-                <div id="previewContent" class="bg-white rounded-lg w-full h-full"></div>
-            </div>
-            <div class="p-4 border-t border-dark-300 flex flex-col gap-3">
-                <div class="flex items-center gap-2">
+    <div id="previewModal" class="fixed inset-0 bg-black/0 z-50 hidden flex flex-col transition-all duration-300">
+        <div class="flex-1 flex flex-col h-full opacity-0 scale-95 transition-all duration-300">
+            <!-- Header -->
+            <div class="bg-dark-200 border-b border-dark-300 flex items-center justify-between px-6 py-4">
+                <div class="flex items-center gap-4">
+                    <h3 class="text-xl font-semibold">Preview Generated App</h3>
+                    <div class="h-6 w-px bg-dark-300"></div>
                     <input type="text" id="filename" 
-                           class="flex-1 px-4 py-2 bg-dark-300 border border-dark-500 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                           class="px-4 py-2 bg-dark-300 border border-dark-500 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 w-80"
                            placeholder="Enter filename (e.g., my-todo-app.html)">
                 </div>
-                <div class="flex gap-2 justify-end">
+                <div class="flex items-center gap-3">
                     <button id="closePreview" class="px-4 py-2 border border-dark-500 text-gray-300 hover:text-white hover:bg-dark-300 rounded-lg transition-colors">
                         Close
                     </button>
-                    <button id="saveFile" class="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-white transition-colors">
+                    <button id="saveFile" class="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-white transition-colors flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                        </svg>
                         Save App
                     </button>
+                    <div class="h-6 w-px bg-dark-300 mx-2"></div>
+                    <button id="closePreviewModal" class="p-2 hover:bg-dark-300 rounded-lg transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
                 </div>
+            </div>
+            <!-- Content -->
+            <div class="flex-1 bg-gray-100">
+                <div id="previewContent" class="w-full h-full"></div>
             </div>
         </div>
     </div>
@@ -190,7 +195,7 @@
                         <!-- Navigation -->
                         <nav class="flex items-center space-x-2">
                             <a href="{{ url_for('index') }}" 
-                               class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-300 hover:text-white bg-dark-300 rounded-lg transition-colors hover:bg-dark-400">
+                               class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-300 hover:text-white bg-dark-300 rounded-lg transition-colors hover:bg-dark-400 left-20 absolute">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                                 </svg>
@@ -475,11 +480,9 @@
             function initializeFileEditing() {
                 document.querySelectorAll('.edit-file-btn').forEach(button => {
                     button.addEventListener('click', async (e) => {
-                        console.log("Editing file");
                         e.preventDefault();
 
                         const filename = button.dataset.filename;
-                        console.log(`Editing file: ${filename}`);
                         if (filename) {
 
                             // close hamburger menu
@@ -498,9 +501,47 @@
                 const response = await fetch(filePath);
                 const content = await response.text();
                 console.log(`File content: ${content}`);
-                addMessage(`Editing file: ${filename}`, "user");
-                chatHistory.push({ text: `Im editing the file: ${filename}: ${content}`, sender: "user" });
-                saveChatHistory();
+
+                // Add message with preview button
+                const msg = document.createElement("div");
+                msg.className = "max-w-[75%] p-4 rounded-2xl mt-5 mx-6 ml-auto bg-gradient-to-r from-blue-600 to-blue-700 rounded-br-lg";
+                
+                // Create content container
+                const contentContainer = document.createElement("div");
+                contentContainer.innerHTML = marked.parse(`Editing file: ${filename}`);
+                msg.appendChild(contentContainer);
+                
+                // Add preview and edit buttons
+                const buttonContainer = document.createElement("div");
+                buttonContainer.className = "flex gap-2 mt-3";
+                
+                const previewButton = document.createElement("button");
+                previewButton.className = "px-4 py-2 bg-accent-primary hover:bg-accent-secondary rounded-lg text-white transition-colors";
+                previewButton.textContent = "Preview";
+                previewButton.onclick = () => ViewApp(content, true, filename);
+                
+                const editButton = document.createElement("button");
+                editButton.className = "px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-white transition-colors";
+                editButton.textContent = "Edit";
+                editButton.onclick = () => {
+                    // Clear existing chat and start fresh edit context
+                    chatHistory = [{
+                        text: `I want to edit this file: ${filename}\n\nCurrent content:\n\`\`\`html\n${content}\n\`\`\`\n\nPlease help me improve this code.`,
+                        sender: "user"
+                    }];
+                    saveChatHistory();
+                    renderChatHistory();
+                    messageInput.value = `I want to edit this file. Here's what I want to change: `;
+                    messageInput.focus();
+                    updateSendButtonState();
+                };
+                
+                buttonContainer.appendChild(previewButton);
+                buttonContainer.appendChild(editButton);
+                msg.appendChild(buttonContainer);
+                
+                messagesEl.appendChild(msg);
+                messagesEl.scrollTop = messagesEl.scrollHeight;
             }
 
             // Initialize file deletion
@@ -526,18 +567,9 @@
                             
                             const data = await response.json();
                             if (response.ok) {
-                                // Remove the file element from the UI
-                                const fileElement = button.closest('.group');
-                                if (fileElement) {
-                                    fileElement.remove();
-                                }
                                 addMessage(`File ${filename} deleted successfully`, "bot");
-                                
-                                // If no files left, show the "No files yet" message
-                                const filesList = document.querySelector('.space-y-3');
-                                if (filesList && !filesList.querySelector('.group')) {
-                                    filesList.innerHTML = '<div class="p-4 bg-dark-300 rounded-xl text-gray-400 text-sm">No files yet</div>';
-                                }
+                                // Update the sidebar to reflect the changes
+                                updateSidebar();
                             } else {
                                 addMessage(`Error deleting file: ${data.error}`, "bot");
                             }
@@ -608,7 +640,7 @@
                 chatHistory = [];
                 saveChatHistory();
                 renderChatHistory();
-                addMessage(`Using ${name}. How can I assist you today?`, "bot");
+                addMessage(`Lets build something amazing? Better prompt makes better results`, "bot");
 
                 if(selectedModel === "html_service" && messageInput) {
                     // messageInput.value = "Create me a simple todo list app. I want to be able to add, edit and delete tasks.";
@@ -662,6 +694,169 @@
                 });
             }
 
+            // Function to update the sidebar content
+            async function updateSidebar() {
+                try {
+                    const response = await fetch('/get_user_files', {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    const contentType = response.headers.get("content-type");
+                    if (!contentType || !contentType.includes("application/json")) {
+                        throw new TypeError("Oops, we haven't got JSON!");
+                    }
+                    
+                    const data = await response.json();
+                    const filesList = document.querySelector('.space-y-3');
+                    if (!filesList) return;
+
+                    if (!data.files || data.files.length === 0) {
+                        filesList.innerHTML = '<div class="p-4 bg-dark-300 rounded-xl text-gray-400 text-sm">No files yet</div>';
+                        return;
+                    }
+
+                    filesList.innerHTML = data.files.map(file => `
+                        <div class="group relative bg-dark-300 rounded-xl transition-all hover:bg-dark-400">
+                            <button class="file-content-btn w-full text-left block p-4 text-gray-200" 
+                                    data-file="${file}">
+                                <div class="flex items-center gap-3">
+                                    <svg class="w-5 h-5 text-accent-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                    </svg>
+                                    <span class="text-sm font-medium">${file.replace('.html', '')}</span>
+                                </div>
+                            </button>
+                            <div class="flex absolute right-3 top-1/2 -translate-y-1/2">
+                                <button class="edit-file-btn p-2 hover:bg-accent-primary/20 rounded-lg transition-all"
+                                        data-filename="${file}">
+                                    <svg class="w-4 h-4 text-accent-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                </button>
+                                <button class="delete-file p-2 hover:bg-accent-danger/20 rounded-lg transition-all"
+                                        data-filename="${file}">
+                                    <svg class="w-4 h-4 text-accent-danger" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    `).join('');
+
+                    // Reinitialize event listeners for the new elements
+                    initializeModalEvents();
+                    initializeFileDeletion();
+                    initializeFileEditing();
+                } catch (error) {
+                    console.error('Error updating sidebar:', error);
+                }
+            }
+
+            // Function to view HTML app
+            function ViewApp(html, isEditing = false, filename = '') {
+                console.log("Viewing HTML app:", html);
+
+                // Get modal elements
+                const previewModal = document.getElementById('previewModal');
+                const previewContent = document.getElementById('previewContent');
+                const modalContainer = previewModal.firstElementChild;
+                const closePreviewModal = document.getElementById('closePreviewModal');
+                const closePreview = document.getElementById('closePreview');
+                const saveFile = document.getElementById('saveFile');
+                const filenameInput = document.getElementById('filename');
+                
+                // Create a function to handle modal closing
+                const closeModal = () => {
+                    // Start fade out animation
+                    previewModal.classList.remove('bg-black/90');
+                    modalContainer.classList.add('opacity-0', 'scale-95');
+                    // Wait for animation to complete before hiding
+                    setTimeout(() => {
+                        previewModal.classList.add('hidden');
+                        if (!isEditing) {
+                            filenameInput.value = '';
+                        }
+                        // Remove event listeners
+                        closePreviewModal.removeEventListener('click', closeModal);
+                        closePreview.removeEventListener('click', closeModal);
+                        saveFile.removeEventListener('click', handleSave);
+                        document.removeEventListener('keydown', handleEscKey);
+                    }, 300);
+                };
+
+                // Create a function to handle saving
+                const handleSave = async () => {
+                    if (!filenameInput.value.trim()) {
+                        addMessage("Please enter a filename", "bot");
+                        return;
+                    }
+                    
+                    try {
+                        const permanentSaveResponse = await fetch('/save_html', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ 
+                                html: html, 
+                                save: true,
+                                filename: filenameInput.value.trim().endsWith('.html') 
+                                    ? filenameInput.value.trim() 
+                                    : filenameInput.value.trim() + '.html'
+                            })
+                        });
+                        
+                        const permanentSaveData = await permanentSaveResponse.json();
+                        if (permanentSaveData.saved) {
+                            addMessage(`HTML app saved successfully as ${filenameInput.value}!`, "bot");
+                            console.log("HTML app saved successfully as " + filenameInput.value);
+                            closeModal();
+                            // Refresh the sidebar content
+                            updateSidebar();
+                        }
+                    } catch (error) {
+                        addMessage("Error saving HTML app: " + error.message, "bot");
+                    }
+                };
+
+                // Create a function to handle escape key
+                const handleEscKey = (e) => {
+                    if (e.key === 'Escape' && !previewModal.classList.contains('hidden')) {
+                        closeModal();
+                    }
+                };
+                
+                // Set up preview iframe
+                previewContent.innerHTML = `<iframe class="w-full h-full border-0" srcdoc="${html.replace(/"/g, '&quot;')}"></iframe>`;
+                
+                // If we're editing, set the filename
+                if (isEditing && filename) {
+                    filenameInput.value = filename;
+                }
+                
+                // Show modal with animation
+                previewModal.classList.remove('hidden');
+                // Trigger reflow
+                previewModal.offsetHeight;
+                // Add background and fade in content
+                previewModal.classList.add('bg-black/90');
+                modalContainer.classList.remove('opacity-0', 'scale-95');
+                
+                // Attach event listeners
+                closePreviewModal.addEventListener('click', closeModal);
+                closePreview.addEventListener('click', closeModal);
+                saveFile.addEventListener('click', handleSave);
+                document.addEventListener('keydown', handleEscKey);
+            }
+
             // Initialize everything
             loadServicesConfig();
             initializeModalEvents();
@@ -670,17 +865,10 @@
             chatHistory = [];
             saveChatHistory();
             renderChatHistory();
-            selectService(servicesConfig.services[0].id, servicesConfig.services[0].url[servicesConfig.environment], servicesConfig.services[0].name);
+            selectService(servicesConfig.services[1].id, servicesConfig.services[1].url[servicesConfig.environment], servicesConfig.services[1].name);
             console.log(servicesConfig);
 
-            // Service URLs mapping
-            const serviceUrls = {
-                'service1': 'https://my-assistant.co.za/service1/query',
-                'base_chat':  'http://127.0.0.1:3000/query', //'https://my-assistant.co.za/base_chat/query',
-                'chatgpt_service': 'https://my-assistant.co.za/chatgpt_service/query',
-                'data_analyser': 'https://my-assistant.co.za/data_analyser/query',
-                'html_service': 'https://my-assistant.co.za/html_service/query'
-            };
+            // Service URLs are now handled through servicesConfig
 
             // Load chat history from localStorage
             function loadChatHistory() {
@@ -702,14 +890,17 @@
                 isTyping = true;
                 const indicator = document.createElement("div");
                 indicator.id = "typingIndicator";
-                indicator.className = "flex gap-1 p-3 w-fit";
+                indicator.className = "flex gap-1 p-3 w-fit bg-dark-200 border border-dark-300 rounded-bl-lg max-w-[75%] mt-5 mx-6";
                 indicator.innerHTML = `
-                    <div class="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
-                    <div class="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
-                    <div class="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style="animation-delay: 0.4s"></div>
+                    <div class="w-2 h-2 bg-gray-500 rounded-full animate-[bounce_1s_infinite]"></div>
+                    <div class="w-2 h-2 bg-gray-500 rounded-full animate-[bounce_1s_infinite_0.2s]"></div>
+                    <div class="w-2 h-2 bg-gray-500 rounded-full animate-[bounce_1s_infinite_0.4s]"></div>
                 `;
-                messagesEl.appendChild(indicator);
-                messagesEl.scrollTop = messagesEl.scrollHeight;
+                const container = document.querySelector('#messages .max-w-3xl');
+                if (container) {
+                    container.appendChild(indicator);
+                    container.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                }
             }
 
             // Hide typing indicator
@@ -724,12 +915,12 @@
             function renderChatHistory() {
                 messagesEl.innerHTML = "";
                 chatHistory.forEach(msg => {
-                    addMessage(msg.text, msg.sender, false);
+                    addMessage(msg.text, msg.sender, false, msg.html);
                 });
             }
 
             // Add a message to the chat
-            function addMessage(text, sender = "user", save = true) {
+            function addMessage(text, sender = "user", save = true, html = null) {
                 const msg = document.createElement("div");
                 msg.className = `max-w-[75%] p-4 rounded-2xl mt-5 mx-6 ${
                     sender === "user" 
@@ -737,24 +928,39 @@
                         : "bg-dark-200 border border-dark-300 rounded-bl-lg"
                 }`;
                 
+                // Create a container for the message content
+                const contentContainer = document.createElement("div");
+                
                 // Use marked.js to render markdown
-                msg.innerHTML = marked.parse(text);
+                contentContainer.innerHTML = marked.parse(text);
                 
                 // Apply syntax highlighting to code blocks
-                msg.querySelectorAll('pre code').forEach((block) => {
+                contentContainer.querySelectorAll('pre code').forEach((block) => {
                     hljs.highlightBlock(block);
                 });
                 
                 // Style code blocks
-                msg.querySelectorAll('pre').forEach((block) => {
+                contentContainer.querySelectorAll('pre').forEach((block) => {
                     block.className = 'bg-dark-100 p-3 rounded-lg my-2 overflow-x-auto';
                 });
+                
+                // Add the content container to the message
+                msg.appendChild(contentContainer);
+                
+                // If there's HTML content, add a View button
+                if (html) {
+                    const viewButton = document.createElement("button");
+                    viewButton.className = "mt-3 px-4 py-2 bg-accent-primary hover:bg-accent-secondary rounded-lg text-white transition-colors";
+                    viewButton.textContent = "View App";
+                    viewButton.onclick = () => ViewApp(html);
+                    msg.appendChild(viewButton);
+                }
                 
                 messagesEl.appendChild(msg);
                 messagesEl.scrollTop = messagesEl.scrollHeight;
                 
                 if (save) {
-                    chatHistory.push({ text, sender });
+                    chatHistory.push({ text, sender, html });
                     saveChatHistory();
                 }
             }
@@ -805,64 +1011,11 @@
                     if(selectedModel === "html_service"){
                         // get html from data.response
                         const html = data.response;
+                        console.log("HTML:", html);
                         
-                        // Show preview modal
-                        const previewModal = document.getElementById('previewModal');
-                        const previewContent = document.getElementById('previewContent');
-                        const closePreviewModal = document.getElementById('closePreviewModal');
-                        const closePreview = document.getElementById('closePreview');
-                        const saveFile = document.getElementById('saveFile');
-                        const filename = document.getElementById('filename');
-                        
-                        // Set up preview iframe
-                        previewContent.innerHTML = `<iframe class="w-full h-full border-0" srcdoc="${html.replace(/"/g, '&quot;')}"></iframe>`;
-                        
-                        // Show modal
-                        previewModal.classList.remove('hidden');
-                        
-                        // Handle close
-                        const closeModal = () => {
-                            previewModal.classList.add('hidden');
-                            filename.value = '';
-                        };
-                        
-                        closePreviewModal.addEventListener('click', closeModal);
-                        closePreview.addEventListener('click', closeModal);
-                        
-                        // Handle save
-                        saveFile.addEventListener('click', async () => {
-                            if (!filename.value.trim()) {
-                                addMessage("Please enter a filename", "bot");
-                                return;
-                            }
-                            
-                            try {
-                                const permanentSaveResponse = await fetch('/save_html', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                    },
-                                    body: JSON.stringify({ 
-                                        html: html, 
-                                        save: true,
-                                        filename: filename.value.trim().endsWith('.html') 
-                                            ? filename.value.trim() 
-                                            : filename.value.trim() + '.html'
-                                    })
-                                });
-                                
-                                const permanentSaveData = await permanentSaveResponse.json();
-                                if (permanentSaveData.saved) {
-                                    addMessage(`HTML app saved successfully as ${filename.value}!`, "bot");
-                                    closeModal();
-                                }
-                            } catch (error) {
-                                addMessage("Error saving HTML app: " + error.message, "bot");
-                            }
-                        });
-                        
-                        // Add message with link after preview is shown
-                        addMessage(`HTML generated successfully! You can preview and save it now. `, "bot");
+                        // Add message with link and show preview
+                        addMessage(`HTML generated successfully! You can preview and save it now.`, "bot", true, html);
+                        ViewApp(html);
                     } else {
                         addMessage(data.response || JSON.stringify(data), "bot");
                     }

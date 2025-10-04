@@ -290,6 +290,15 @@ def save_html():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/get_user_files', methods=['GET'])
+def get_user_files():
+    """Get list of user's HTML files."""
+    try:
+        files = load_user_files()
+        return jsonify({'files': files})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/delete_file', methods=['POST'])
 def delete_file():
     try:

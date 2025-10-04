@@ -1016,6 +1016,46 @@
                         // Add message with link and show preview
                         addMessage(`HTML generated successfully! You can preview and save it now.`, "bot", true, html);
                         ViewApp(html);
+                    } else if ((data.type === 'image' && data.format === 'base64') || data.image) {
+                        // Handle base64 image response
+                        const imgElement = document.createElement('img');
+                        const base64Data = data.image || data.response; // Handle both formats
+                        imgElement.src = `data:image/${data.mime || 'png'};base64,${base64Data}`;
+                        imgElement.className = 'max-w-full rounded-lg shadow-lg';
+                        imgElement.alt = data.alt || 'Generated image';
+                        
+                        // Create a container for the image and any additional content
+                        const container = document.createElement('div');
+                        container.className = 'space-y-4';
+                        
+                        // Add any message text if provided
+                        if (data.message) {
+                            const messageDiv = document.createElement('div');
+                            messageDiv.innerHTML = marked.parse(data.message);
+                            container.appendChild(messageDiv);
+                        }
+                        
+                        // Add the image
+                        container.appendChild(imgElement);
+                        
+                        // Add download button
+                        const downloadBtn = document.createElement('button');
+                        downloadBtn.className = 'mt-3 px-4 py-2 bg-accent-primary hover:bg-accent-secondary rounded-lg text-white transition-colors';
+                        downloadBtn.textContent = 'Download Image';
+                        downloadBtn.onclick = () => {
+                            const link = document.createElement('a');
+                            link.href = imgElement.src;
+                            link.download = `generated-image-${Date.now()}.${data.mime || 'png'}`;
+                            link.click();
+                        };
+                        container.appendChild(downloadBtn);
+                        
+                        // Add the message with the image container
+                        addMessage('', 'bot', true);
+                        const lastMessage = messagesEl.lastElementChild;
+                        if (lastMessage) {
+                            lastMessage.appendChild(container);
+                        }
                     } else {
                         addMessage(data.response || JSON.stringify(data), "bot");
                     }

@@ -32,7 +32,7 @@ def SetupAgent():
 
 
 # Send a prompt to ChatGPT
-def Query(prompt, model="gpt-4"):
+def QueryText(prompt, model="gpt-4"):
     try:
         system_prompt = "You are a helpful assistant."
         response = openai.chat.completions.create(
@@ -43,10 +43,25 @@ def Query(prompt, model="gpt-4"):
             ]
         )
         return response.choices[0].message.content
-        return response.choices[0].message["content"]
     except Exception as e:
         return f"❌ Error: {e}"
 
+def QueryImage(prompt, size="1024x1024"):
+    try:
+        response = openai.images.generate(
+            model="dall-e-3",
+            prompt=prompt,
+            size=size,
+            response_format="b64_json"   # request base64 output
+        )
+        
+        # Extract base64 string
+        image_base64 = response.data[0].b64_json
+        return image_base64
+    except Exception as e:
+        return f"❌ Error: {e}"
+
+# Example usage:
     
 SetupAgent()
 
@@ -63,6 +78,25 @@ def health_check():
 def help_page():
     return "This is ChatGPT Service, providing various endpoints for data processing and querying."
 
+@app.route('/image', methods=['GET', 'POST'])
+def handle_image():
+    # Get prompt from either query parameters or JSON body
+    if request.method == 'GET':
+        prompt = request.args.get('prompt')
+    else:  # POST
+        data = request.get_json()
+        prompt = data.get('prompt') if data else None
+    
+    if not prompt:
+        return jsonify({"error": "No prompt provided"}), 400
+    
+    try:
+        image_base64 = QueryImage(prompt)
+        return jsonify({"image": image_base64})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+    
 # Example API endpoint for processing data
 @app.route('/process', methods=['POST'])
 def process_data():
@@ -94,8 +128,18 @@ def chat():
         return jsonify({"error": "No message provided"}), 400
 
     user_message = data['query']
-    chat_response = Query(user_message)
-    return jsonify({"response": chat_response})
+    if 'image' in user_message:
+        try:
+            image_base64 = QueryImage(user_message)
+            return jsonify({"image": image_base64})
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+    else:
+        try:
+            chat_response = QueryText(user_message)
+            return jsonify({"response": chat_response})
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
 
 
 if __name__ == '__main__':
